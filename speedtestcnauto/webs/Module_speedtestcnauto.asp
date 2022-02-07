@@ -168,6 +168,7 @@ function queryTisu()
                         $('#tisu_info_3').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
                         $('#tisu_info_4').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up / 1024) + " M");
                         $('#tisu_info_5').html(status.remain_time);
+                        $('#tisu_status_7').html(status.remain_time);
                     }
                     else
                     {
@@ -239,11 +240,6 @@ function manualSpeedUp()
         });
     }
 }
-
-function changeCanSpeed()
-{
-
-}
 </script>
 </head>
 <body onload="init();">
@@ -303,6 +299,12 @@ function changeCanSpeed()
 															未开通提速套餐
 														</td>
 													</tr>
+                                                    <tr>
+                                                        <th style="width:18%">宽带提速有效期</th>
+                                                        <td id="tisu_status_7">
+                                                            未开通提速套餐
+                                                        </td>
+                                                    </tr>
 													<tr>
 														<th style="width:18%">前台查询IP地址</th>
 														<td id="tisu_status_3">
