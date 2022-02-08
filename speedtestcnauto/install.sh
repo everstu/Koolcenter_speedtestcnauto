@@ -131,12 +131,7 @@ install_now(){
 
 	# isntall file
 	echo_date "安装插件相关文件..."
-	cd /tmp
-	cp -rf /tmp/${module}/res/* /koolshare/res/
-	cp -rf /tmp/${module}/scripts/* /koolshare/scripts/
-	cp -rf /tmp/${module}/webs/* /koolshare/webs/
-	cp -rf /tmp/${module}/uninstall.sh /koolshare/scripts/uninstall_${module}.sh
-
+  #检查jq是否安装
   echo_date "检查是否安装jq_speed..."
 	if [ ! -x "/koolshare/bin/jq_speed" ]; then
   		echo_date "未安装，正在安装jq_speed..."
@@ -146,6 +141,12 @@ install_now(){
   else
       echo_date "jq_speed已安装，跳过..."
   fi
+  #复制临时文件到目录
+	cd /tmp
+	cp -rf /tmp/${module}/res/* /koolshare/res/
+	cp -rf /tmp/${module}/scripts/* /koolshare/scripts/
+	cp -rf /tmp/${module}/webs/* /koolshare/webs/
+	cp -rf /tmp/${module}/uninstall.sh /koolshare/scripts/uninstall_${module}.sh
 
 	# Permissions
 	chmod 755 /koolshare/${module}/* >/dev/null 2>&1
