@@ -142,6 +142,7 @@ install_now(){
   		echo_date "未安装，正在安装jq_speed..."
   		cp -f /tmp/${module}/bin/jq_speed /koolshare/bin/
   		chmod 755 /koolshare/bin/jq_speed >/dev/null 2>&1
+  		echo_date "jq_speed安装完成..."
   else
       echo_date "jq_speed已安装，跳过..."
   fi
@@ -169,12 +170,9 @@ install_now(){
 
   echo_date "安装完毕，启用${TITLE}插件！"
   #添加定时任务
-  sh /koolshare/scripts/${module}_main.sh start >/dev/null 2>&1
-  echo_date "插件启用成功，正在执行插件，此步骤可能耗时较久！"
-  sleep 1
-  #启用插件
-  sh /koolshare/scripts/${module}_main.sh reopen >/dev/null 2>&1
-  echo_date "插件执行成功，以后插件每5分钟自动执行一次！"
+  echo_date "插件启用中，此步骤可能耗时较久！"
+  /bin/sh /koolshare/scripts/${module}_main.sh start >/dev/null 2>&1
+  echo_date "插件启用成功，以后插件每5分钟自动执行一次！"
 
 	# finish
 	echo_date "${TITLE}插件安装完毕！"
