@@ -41,7 +41,7 @@ get_fw_type() {
 
 platform_test(){
 	local LINUX_VER=$(uname -r|awk -F"." '{print $1$2}')
-	if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -ge "41" ];then
+	if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -eq "26" ];then
 		echo_date 机型："${MODEL} ${FW_TYPE_NAME} 符合安装要求，开始安装插件！"
 	else
 		exit_install 1
@@ -91,9 +91,9 @@ exit_install(){
 	local state=$1
 	case $state in
 		1)
-			echo_date "本插件适用于【koolshare 梅林改/官改 hnd/axhnd/axhnd.675x】固件平台！"
+			echo_date "本插件适用于【koolshare merlin armv7l 384/386】固件平台！"
 			echo_date "你的固件平台不能安装！！!"
-			echo_date "本插件支持机型/平台：https://github.com/koolshare/rogsoft#rogsoft"
+			echo_date "本插件支持机型/平台：https://github.com/koolshare/armsoft#armsoft"
 			echo_date "退出安装！"
 			rm -rf /tmp/${module}* >/dev/null 2>&1
 			exit 1
