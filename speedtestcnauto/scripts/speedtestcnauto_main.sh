@@ -10,7 +10,6 @@ start_reopen(){
     #获取WANIP
     newwanip=`curl ifconfig.me`
     #如接口获取不到ip，本次取消操作
-    echo $newwanip
     if [ x"$newwanip" = "x" ]; then
       exit
     fi
@@ -20,7 +19,6 @@ start_reopen(){
       oldwanip="0.0.0.0"
     fi
     #对比上次IP，如相同则退出，否则执行提速
-    echo $oldwanip
     if [ "$newwanip" = "$oldwanip" ]; then
       exit
     else
@@ -42,9 +40,8 @@ real_reopen(){
 }
 
 add_cron(){
-  echo_date "添加签到定时任务，每天 $qiandao_time 点自动签到..." >> $LOGFILE
   sed -i '/speedtestcnauto_main/d' /var/spool/cron/crontabs/* >/dev/null 2>&1
-  cru a speedtestcnauto_main "*/1 * * * * /bin/sh /koolshare/scripts/speedtestcnauto_main.sh reopen"
+  cru a speedtestcnauto_main "*/5 * * * * /bin/sh /koolshare/scripts/speedtestcnauto_main.sh reopen"
 }
 
 case $1 in

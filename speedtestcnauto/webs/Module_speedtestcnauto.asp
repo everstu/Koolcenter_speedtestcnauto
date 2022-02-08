@@ -162,8 +162,8 @@ function queryTisu()
                     let status = data.status;
                     if(status.can_speed === 1)
                     {
-                        $('#tisu_status_1').html(formatTextColor('支持提速',2));
-                        $('#tisu_info_1').html(formatTextColor('支持提速',2));
+                        $('#tisu_status_1').html(formatTextColor('当前宽带支持提速',2));
+                        $('#tisu_info_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_2').html(status.msg);
                         $('#tisu_info_3').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
                         $('#tisu_info_4').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up / 1024) + " M");
