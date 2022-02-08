@@ -26,9 +26,9 @@ start_reopen(){
       down_expire_trial_t=`echo ${query_data} | jq_speed .data.down_expire_trial_t`
       up_expire_t=`echo ${query_data} | jq_speed .data.up_expire_t`
       if [ $down_expire_t -eq "0" ] && [ $down_expire_trial_t -eq "0" ] && [ $up_expire_t -eq "0" ];then
-          need_speed="0"
-        else
-          need_speed="1"
+        need_speed="0"
+      else
+        need_speed="1"
       fi
       #执行提速操作
       if [ $need_speed -eq "1" ];then
