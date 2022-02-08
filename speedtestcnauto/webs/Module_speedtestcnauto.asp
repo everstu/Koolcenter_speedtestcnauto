@@ -78,7 +78,7 @@ function getRuntime()
     $.ajax({
         type: "POST",
         url: "/_api/",
-        async: false,
+        async: true,
         data: JSON.stringify(postData),
         success: function(response) {
             var arr = response.result.split("@");
@@ -217,7 +217,7 @@ function manualSpeedUp()
         $.ajax({
             type: "POST",
             url: "/_api/",
-            async: false,
+            async: true,
             data: JSON.stringify(postData),
             beforeSend:function (){
                 $('#mSup').attr('disabled','disabled');
