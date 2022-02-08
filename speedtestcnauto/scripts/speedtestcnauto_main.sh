@@ -1,11 +1,12 @@
 #!/bin/sh
 source /koolshare/scripts/base.sh
-mkdir -p /koolshare/speedtestcnauto/runtime/
-lastwaniptxt="/koolshare/speedtestcnauto/runtime/lastwanip"
-waniplogtxt="/koolshare/speedtestcnauto/runtime/waniplog"
-runtimelog="/koolshare/speedtestcnauto/runtime/runtimelog"
-tisutimelog="/koolshare/speedtestcnauto/runtime/tisutimelog"
-querydatalog="/koolshare/speedtestcnauto/runtime/querydatalog"
+runtimeDir="/koolshare/speedtestcnauto/runtime/"
+mkdir -p $runtimeDir
+lastwaniptxt="${runtimeDir}lastwanip"
+waniplogtxt="${runtimeDir}waniplog"
+runtimelog="${runtimeDir}runtimelog"
+tisutimelog="${runtimeDir}tisutimelog"
+querydatalog="${runtimeDir}querydatalog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 can_speed="1"
@@ -78,7 +79,7 @@ reopen)
 *)#web提交
   if [ "${2}" = "reopen" ];then
     #清理缓存文件
-    rm -rf /tmp/speedtestcnauto/*
+    rm -rf ${runtimeDir}*
     #执行提速脚本
     start_reopen
     tisutips="手动提速执行成功,请自行确认是否提速成功."
