@@ -61,13 +61,14 @@
 </style>
 <script>
 var CANSPEED = true;
+var NEEDQUERY = true;
 
 function init() {
 	show_menu(menu_hook);
     showTab();
 	tab_switch();
     queryTisu();
-    getRuntime();
+    setTimeout("getRuntime()",5000);
 }
 
 function getRuntime()
@@ -77,22 +78,19 @@ function getRuntime()
     $.ajax({
         type: "POST",
         url: "/_api/",
-        async: true,
+        async: false,
         data: JSON.stringify(postData),
         success: function(response) {
             var arr = response.result.split("@");
-            if (arr[0] == "" || arr[1] == "") {
-                E("tisu_status_4").innerHTML = "等待程序运行 - " + "Waiting for first refresh...";
-                E("tisu_status_5").innerHTML = "等待程序运行 - " + "Waiting for first refresh...";
-                E("tisu_status_6").innerHTML = "等待程序运行 - " + "Waiting for first refresh...";
-            } else {
+            if (arr[0] != "" && arr[1] != "") {
                 E("tisu_status_4").innerHTML = arr[0];
                 E("tisu_status_5").innerHTML = arr[1];
                 E("tisu_status_6").innerHTML = arr[2];
+                NEEDQUERY = false;
             }
         }
     });
-    if(CANSPEED)
+    if(CANSPEED || NEEDQUERY)
     {
         setTimeout("getRuntime()",5000);
     }
@@ -141,25 +139,33 @@ function queryTisu()
         url: "https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index",
         cache: false,
         type: "GET",
-        async: true,
+        async: false,
         dataType: "json",
         success: function(res) {
             if(res.hasOwnProperty('data'))
             {
-                let data = res.data;
-                $('#tisu_status_2').html(formatTextColor('未开通提速套餐'));
+                var data = res.data;
+                var down_text = '未开通下行提速套餐';
+                var up_text = '未开通上行提速套餐';
+                $('#tisu_status_2').html(formatTextColor(down_text));
                 if(data.down_expire_t)
                 {
-                    $('#tisu_status_2').html('已开通提速套餐');
+                    down_text = '已开通下行提速套餐';
                 }
                 if(data.down_expire_trial_t)
                 {
-                    $('#tisu_status_2').html('已开通试用套餐');
+                    down_text = '已开通下行试用套餐';
                 }
+                if(data.up_expire_t)
+                {
+                    up_text = '已开通上行提速套餐';
+                }
+                $('#tisu_status_2').html(down_text + ' / ' + up_text);
+
                 $('#tisu_status_3').html(data.addr.substring(0,data.addr.indexOf(':')));
                 if(data.hasOwnProperty('status'))
                 {
-                    let status = data.status;
+                    var status = data.status;
                     if(status.can_speed === 1)
                     {
                         $('#tisu_status_1').html(formatTextColor('当前宽带支持提速',2));
@@ -201,7 +207,9 @@ function formatTextColor(text, color)
 function manualSpeedUp()
 {
     queryTisu();
-    if(CANSPEED)
+    var setTime = 60;
+    var time = setTime;
+    if(CANSPEED)//不支持提速就不要点了.
     {
         var id2 = parseInt(Math.random() * 100000000);
         var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['reopen'], "fields": ""};
@@ -209,15 +217,19 @@ function manualSpeedUp()
         $.ajax({
             type: "POST",
             url: "/_api/",
-            async: true,
+            async: false,
             data: JSON.stringify(postData),
             beforeSend:function (){
                 $('#mSup').attr('disabled','disabled');
             },
             success: function(response) {
-                var setTime = 60;
-                var time = setTime;
-                $('#warning').html(response.result);
+                var arr = response.result.split("@");
+                if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
+                    E("tisu_status_4").innerHTML = arr[0];
+                    E("tisu_status_5").innerHTML = arr[1];
+                    E("tisu_status_6").innerHTML = arr[2];
+                    E("warning").innerHTML       = arr[3];
+                }
                 t = setInterval(function () {
                     time--;
                     $('#mSup').val('冷却中,剩余 '+time+' 秒');
@@ -238,6 +250,25 @@ function manualSpeedUp()
                 clearInterval(t);
             }
         });
+    }
+    else
+    {
+        $('#mSup').attr('disabled','disabled');
+        var timeinter = setInterval(function () {
+            time--;
+            $('#mSup').val('冷却中,剩余 '+time+' 秒');
+            if(time <= 0)
+            {
+                $('#mSup').removeAttr('disabled');
+                $('#mSup').val('手动提速');
+                if(CANSPEED)
+                {
+                    $('#warning').html('');
+                }
+                time = setTime;
+                clearInterval(timeinter);
+            }
+        },1000);
     }
 }
 </script>
