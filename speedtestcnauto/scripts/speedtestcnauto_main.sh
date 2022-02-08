@@ -22,38 +22,38 @@ start_reopen(){
     #如果能提速则执行提速操作否则直接跳走
     if [ $can_speed -eq "1" ];then
       #检查是否需要执行提速
-      down_expire=`echo ${query_data} | jq_speed .data.down_expire_t`
+      down_expire_t=`echo ${query_data} | jq_speed .data.down_expire_t`
       down_expire_trial_t=`echo ${query_data} | jq_speed .data.down_expire_trial_t`
       up_expire_t=`echo ${query_data} | jq_speed .data.up_expire_t`
-      if [ $down_expire -eq "0" ] && [ $down_expire_trial_t -eq "0" ] && [ $up_expire_t -eq "0" ];then
-          need_speed="0"
-        else
-          need_speed="1"
+      if [ $down_expire_t -eq "0" ] && [ $down_expire_trial_t -eq "0" ] && [ $up_expire_t -eq "0" ];then
+        need_speed="0"
+      else
+        need_speed="1"
       fi
       #执行提速操作
       if [ $need_speed -eq "1" ];then
-          #获取WANIP
-          newwanip=$querywanip
-          #如接口获取不到ip，本次取消操作
-          if [ x"$newwanip" = "x" ]; then
-            exit
-          fi
-          if [ -f $lastwaniptxt ]; then
-            oldwanip=`cat $lastwaniptxt`
-          else
-            oldwanip="0.0.0.0"
-          fi
-          #对比上次IP，如相同则退出，否则执行提速
-          if [ "$newwanip" = "$oldwanip" ]; then
-            exit
-          else
-            curl -s $reopenapi
-            echo `date '+%Y-%m-%d %H:%M:%S'` >$tisutimelog;
-          fi
-          #缓存最新ip地址
-          echo $newwanip > $lastwaniptxt
+        #获取WANIP
+        newwanip=$querywanip
+        #如接口获取不到ip，本次取消操作
+        if [ x"$newwanip" = "x" ]; then
+          exit
+        fi
+        if [ -f $lastwaniptxt ]; then
+          oldwanip=`cat $lastwaniptxt`
         else
-          echo "<font color='yellow'>当前宽带支持提速,但是未开通提速套餐.</font>" >$tisutimelog;
+          oldwanip="0.0.0.0"
+        fi
+        #对比上次IP，如相同则退出，否则执行提速
+        if [ "$newwanip" = "$oldwanip" ]; then
+          exit
+        else
+          curl -s $reopenapi
+          echo `date '+%Y-%m-%d %H:%M:%S'` >$tisutimelog;
+        fi
+        #缓存最新ip地址
+        echo $newwanip > $lastwaniptxt
+      else
+        echo "<font color='yellow'>当前宽带支持提速,但是未开通提速套餐.</font>" >$tisutimelog;
       fi
 
     else
