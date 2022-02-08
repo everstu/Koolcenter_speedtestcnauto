@@ -41,7 +41,7 @@ get_fw_type() {
 
 platform_test(){
 	local LINUX_VER=$(uname -r|awk -F"." '{print $1$2}')
-	if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -ge "41" ];then
+	if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -eq "26" ];then
 		echo_date 机型："${MODEL} ${FW_TYPE_NAME} 符合安装要求，开始安装插件！"
 	else
 		exit_install 1
@@ -91,9 +91,9 @@ exit_install(){
 	local state=$1
 	case $state in
 		1)
-			echo_date "本插件适用于【koolshare 梅林改/官改 hnd/axhnd/axhnd.675x】固件平台！"
+			echo_date "本插件适用于【koolshare merlin armv7l 384/386】固件平台！"
 			echo_date "你的固件平台不能安装！！!"
-			echo_date "本插件支持机型/平台：https://github.com/koolshare/rogsoft#rogsoft"
+			echo_date "本插件支持机型/平台：https://github.com/koolshare/armsoft#armsoft"
 			echo_date "退出安装！"
 			rm -rf /tmp/${module}* >/dev/null 2>&1
 			exit 1
@@ -131,6 +131,17 @@ install_now(){
 
 	# isntall file
 	echo_date "安装插件相关文件..."
+	# 检查jq是否安装
+  echo_date "检查是否安装jq_speed..."
+	if [ ! -x "/koolshare/bin/jq_speed" ]; then
+  		echo_date "未安装，正在安装jq_speed..."
+  		cp -f /tmp/${module}/bin/jq_speed /koolshare/bin/
+  		chmod 755 /koolshare/bin/jq_speed >/dev/null 2>&1
+  		echo_date "jq_speed安装完成..."
+  else
+      echo_date "jq_speed已安装，跳过..."
+  fi
+  # 复制文件到目录
 	cd /tmp
 	cp -rf /tmp/${module}/res/* /koolshare/res/
 	cp -rf /tmp/${module}/scripts/* /koolshare/scripts/
@@ -155,17 +166,14 @@ install_now(){
 	dbus set softcenter_module_${module}_title="${TITLE}"
 	dbus set softcenter_module_${module}_description="${DESCR}"
 
-	
 	# intall different UI
 	install_ui
 
   echo_date "安装完毕，启用${TITLE}插件！"
   #添加定时任务
-  sh /koolshare/scripts/${module}_main.sh start >/dev/null 2>&1
-  echo_date "插件启用成功，正在执行插件，此步骤可能耗时较久!"
-  #启用插件
-  sh /koolshare/scripts/${module}_main.sh reopen >/dev/null 2>&1
-  echo_date "插件执行成功!"
+  echo_date "插件启用中，此步骤可能耗时较久！"
+  /bin/sh /koolshare/scripts/${module}_main.sh start >/dev/null 2>&1
+  echo_date "插件启用成功，以后插件每5分钟自动执行一次！"
 
 	# finish
 	echo_date "${TITLE}插件安装完毕！"
