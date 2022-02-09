@@ -68,7 +68,7 @@ function init() {
     showTab();
 	tab_switch();
     queryTisu();
-    setTimeout("getRuntime()",5000);
+    getRuntime();
 }
 
 function getRuntime()
@@ -362,7 +362,7 @@ function manualSpeedUp()
 													</tr>
 												</table>
 											</div>
-											<div id="kuandai_info_status" >
+											<div id="kuandai_info_status" style="display:none;">
 											    <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                     <tr>
                                                         <th style="width:18%">
