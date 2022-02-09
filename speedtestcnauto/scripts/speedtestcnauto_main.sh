@@ -8,6 +8,7 @@ waniplogtxt="${runtimeDir}waniplog"
 runtimelog="${runtimeDir}runtimelog"
 tisutimelog="${runtimeDir}tisutimelog"
 querydatalog="${runtimeDir}querydatalog"
+tisudatalog="${runtimeDir}tisudatalog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 can_speed="0"
@@ -59,10 +60,11 @@ start_reopen(){
                   exit
                 else
                   tisu_data=$(curl -m 20 -s "$reopenapi")
+                  echo "$tisu_data" >$tisudatalog
                   if [ "$tisu_data" ];then
                      tisumessage=$(date '+%Y-%m-%d %H:%M:%S')
                     else
-                    tisumessage="<font color='yellow'>提速接口请求失败或请求超时</font>"
+                     tisumessage="<font color='yellow'>提速接口请求失败或请求超时</font>"
                   fi
                 fi
                 #缓存最新ip地址
