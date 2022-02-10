@@ -294,10 +294,16 @@ function testSpeedTest() {
     // 这里设置需要检测的url
     link.href = speedtestUrl
     link.onload = function () {
-        console.log('accessTest success')
+        var iframeHeight='420px';
         $(link).remove();//删除元素
         $('#internetSpeed_iframe').attr('src', speedtestUrl);
-        $('#internetSpeed_iframe').css('height','600px');
+        $('#internetSpeed_iframe').css('height',iframeHeight);
+        $('#internetSpeed_iframe').load(function (){
+            $('#internetSpeed_iframe').contents().find('.container').css('height', iframeHeight);
+            $('#internetSpeed_iframe').contents().find('.bg').css('min-height', iframeHeight);
+            $('#internetSpeed_iframe').contents().find('#speedTest_history_div').hide();
+            $('#internetSpeed_iframe').contents().find('.history_desc').hide();
+        });
     }
     link.onerror = function () {
         console.log('accessTest fail')
@@ -342,7 +348,7 @@ function testSpeedTest() {
 														<td colspan="4" cellpadding="0" cellspacing="0" style="padding:0" border="1" bordercolor="#000">
 															<input id="show_btn1" class="show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
 															<input id="show_btn2" class="show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
-															<input id="show_btn3" class="show-btn3" style="cursor:pointer" type="button" value="测试网络速度">
+															<input id="show_btn3" class="show-btn3" style="cursor:pointer" type="button" value="网络速度测试">
 														</td>
 													</tr>
 												</table>
