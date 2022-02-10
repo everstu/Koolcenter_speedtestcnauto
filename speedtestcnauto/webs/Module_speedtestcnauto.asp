@@ -64,13 +64,13 @@ var CANSPEED = true;
 var NEEDQUERY = true;
 
 function init() {
+    testSpeedTest();
 	show_menu(menu_hook);
     showTab();
 	tab_switch();
     queryTisu();
     getRuntime();
 }
-
 function getRuntime()
 {
     var id2 = parseInt(Math.random() * 100000000);
@@ -102,28 +102,42 @@ function showTab()
 	if($('.show-btn1').hasClass("active")){
         $("#kuandai_speed_status").show();
         $("#kuandai_info_status").hide();
+        $("#kuandai_speedtest").hide();
 	}else if($('.show-btn2').hasClass("active")){
         $("#kuandai_info_status").show();
         $("#kuandai_speed_status").hide();
-	}else{
+        $("#kuandai_speedtest").hide();
+	}else if($('.show-btn3').hasClass("active")){
+        $("#kuandai_info_status").hide();
+        $("#kuandai_speed_status").hide();
+        $("#kuandai_speedtest").show();
+    }else{
 		$('.show-btn1').addClass('active');
 		$('.show-btn2').removeClass('active');
+		$('.show-btn3').removeClass('active');
         $("#kuandai_speed_status").show();
         $("#kuandai_info_status").hide();
+        $("#kuandai_speedtest").hide();
 	}
 }
 
 function tab_switch(){
-	$(".show-btn1").click(
-	function() {
+	$(".show-btn1").click(function() {
 		$('.show-btn1').addClass('active');
 		$('.show-btn2').removeClass('active');
+		$('.show-btn3').removeClass('active');
         showTab();
 	});
-	$(".show-btn2").click(
-	function() {
+	$(".show-btn2").click(function() {
 		$('.show-btn1').removeClass('active');
 		$('.show-btn2').addClass('active');
+		$('.show-btn3').removeClass('active');
+        showTab();
+	});
+	$(".show-btn3").click(function() {
+		$('.show-btn1').removeClass('active');
+		$('.show-btn2').removeClass('active');
+		$('.show-btn3').addClass('active');
         showTab();
 	});
 }
@@ -271,6 +285,27 @@ function manualSpeedUp()
         },1000);
     }
 }
+
+function testSpeedTest() {
+    var link = document.createElement('link')
+    var speedtestUrl = '/internet_speed.html';
+    link.rel = "stylesheet"
+    link.type = "text/css"
+    // 这里设置需要检测的url
+    link.href = speedtestUrl
+    link.onload = function () {
+        console.log('accessTest success')
+        $(link).remove();//删除元素
+        $('#internetSpeed_iframe').attr('src', speedtestUrl);
+        $('#internetSpeed_iframe').css('height','600px');
+    }
+    link.onerror = function () {
+        console.log('accessTest fail')
+        $(link).remove();//删除元素
+        $('#kuandai_speedtest').html('<h2 style="text-align:center;">您的路由器不支持测速功能!</h2>');
+    }
+    document.body.appendChild(link)
+}
 </script>
 </head>
 <body onload="init();">
@@ -307,7 +342,7 @@ function manualSpeedUp()
 														<td colspan="4" cellpadding="0" cellspacing="0" style="padding:0" border="1" bordercolor="#000">
 															<input id="show_btn1" class="show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
 															<input id="show_btn2" class="show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
-															<a id="show_btn3" class="show-btn3" style="cursor:pointer" type="button" href="/AdaptiveQoS_InternetSpeed.asp" target="_blank" title="请检查自己路由器是否支持此测速,此测速脚本为路由自带测速脚本.">测试网络速度</a>
+															<input id="show_btn3" class="show-btn3" style="cursor:pointer" type="button" value="测试网络速度">
 														</td>
 													</tr>
 												</table>
@@ -397,6 +432,9 @@ function manualSpeedUp()
                                                         </td>
                                                     </tr>
                                                 </table>
+											</div>
+											<div id="kuandai_speedtest" style="display:none;">
+											    <iframe id="internetSpeed_iframe" style="width: 100%; border: none;" src=""></iframe>
 											</div>
 											<div style="margin:10px 0 10px 5px;" class="splitLine"></div>
 											<div id="warning" style="font-size:14px;margin:20px auto;text-align:center;color:yellow;"></div>
