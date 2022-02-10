@@ -23,7 +23,7 @@
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 <script type="text/javascript" src="/res/softcenter.js"></script>
 <style>
-.show-btn1, .show-btn2, .show-btn3 {
+.show-btn{
 	border-radius: 5px 5px 0px 0px;
 	font-size:10pt;
 	color: #fff;
@@ -299,10 +299,14 @@ function testSpeedTest() {
         $('#internetSpeed_iframe').attr('src', speedtestUrl);
         $('#internetSpeed_iframe').css('height',iframeHeight);
         $('#internetSpeed_iframe').load(function (){
-            $('#internetSpeed_iframe').contents().find('.container').css('height', iframeHeight);
-            $('#internetSpeed_iframe').contents().find('.bg').css('min-height', iframeHeight);
-            $('#internetSpeed_iframe').contents().find('#speedTest_history_div').hide();
-            $('#internetSpeed_iframe').contents().find('.history_desc').hide();
+            var iframeObj = $('#internetSpeed_iframe').contents();
+            iframeObj.find('.container').css('height', iframeHeight);
+            iframeObj.find('.bg').css('min-height', iframeHeight);
+            iframeObj.find('#speedTest_history_div').hide();
+            iframeObj.find('.history_desc').hide();
+            iframeObj.find('.speed_level_more').hide();
+            iframeObj.find('#speed_level_btn').css('cursor','default');
+            iframeObj.find('#speed_level_btn').removeAttr('onclick');
         });
     }
     link.onerror = function () {
@@ -346,9 +350,10 @@ function testSpeedTest() {
 												<table style="margin:10px 0px 0px 0px;border-collapse:collapse" width="100%" height="37px">
 													<tr width="400px">
 														<td colspan="4" cellpadding="0" cellspacing="0" style="padding:0" border="1" bordercolor="#000">
-															<input id="show_btn1" class="show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
-															<input id="show_btn2" class="show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
-															<input id="show_btn3" class="show-btn3" style="cursor:pointer" type="button" value="网络速度测试">
+															<input id="show_btn1" class="show-btn show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
+															<input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
+															<input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
+															<a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
 														</td>
 													</tr>
 												</table>
