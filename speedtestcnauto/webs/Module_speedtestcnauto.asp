@@ -139,7 +139,6 @@ function checkVersion()
                                  if(response['change_log'])
                                  {
                                     changeLog = response['change_log'];
-                                    console.log(changeLog);
                                     $('#soft_change_log').click(function(){
                                         viewChangelog();
                                     });
