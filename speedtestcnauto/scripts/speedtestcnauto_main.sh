@@ -127,7 +127,7 @@ self_upgrade(){
          echo_date "新版本资源下载失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
        fi
      else
-       echo_date "当前版本:v${old_version}newV${new_version}是最新版本,无需更新!" >> $LOGFILE
+       echo_date "当前版本:v${old_version}是最新版本,无需更新!" >> $LOGFILE
    fi
    echo "SPEEDTNBBSCDE">>$LOGFILE
 }
