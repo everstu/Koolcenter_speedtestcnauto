@@ -23,6 +23,25 @@
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 <script type="text/javascript" src="/res/softcenter.js"></script>
 <style>
+.popup_bar_bg_ks{
+position:fixed;
+margin: auto;
+top: 0;
+left: 0;
+width:100%;
+height:100%;
+z-index:99;
+/*background-color: #444F53;*/
+filter:alpha(opacity=90);  /*IE5、IE5.5、IE6、IE7*/
+background-repeat: repeat;
+visibility:hidden;
+overflow:hidden;
+/*background: url(/images/New_ui/login_bg.png);*/
+background:rgba(68, 79, 83, 0.85) none repeat scroll 0 0 !important;
+background-position: 0 0;
+background-size: cover;
+opacity: .94;
+}
 .show-btn{
 	border-radius: 5px 5px 0px 0px;
 	font-size:10pt;
@@ -62,6 +81,9 @@
 <script>
 var CANSPEED = true;
 var NEEDQUERY = true;
+var _responseLen;
+var refresh_flag;
+var count_down;
 
 function init() {
     testSpeedTest();
@@ -70,7 +92,63 @@ function init() {
 	tab_switch();
     queryTisu();
     getRuntime();
+    manualResetControl();
 }
+
+function versionUpdate()
+{
+    showLoadingBar();
+    var id2 = parseInt(Math.random() * 100000000);
+    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update'], "fields": ""};
+    $.ajax({
+        type: "POST",
+        url: "/_api/",
+        async: true,
+        data: JSON.stringify(postData),
+        success: function(response) {
+            if (response.result == id2){
+			    get_realtime_log(0);
+            }
+        }
+    });
+}
+
+function get_realtime_log(flag) {
+    E("ok_button").style.visibility = "hidden";
+    showLoadingBar();
+	$.ajax({
+		url: '/_temp/speedtestcnauto_log.txt',
+		type: 'GET',
+		async: true,
+		cache:false,
+		dataType: 'text',
+		success: function(response) {
+            var retArea = E("log_content");
+            if (response.search("SPEEDTNBBSCDE") != -1) {
+                retArea.value = response.replace("SPEEDTNBBSCDE", "");
+                E("ok_button").style.visibility = "visible";
+                retArea.scrollTop = retArea.scrollHeight;
+                if (flag == 1) {
+                    count_down = -1;
+                    refresh_flag = 0;
+                } else {
+                    count_down = 6;
+                    refresh_flag = 1;
+                }
+                count_down_close();
+                return false;
+            }
+            setTimeout("get_realtime_log(" + flag + ");", 200);
+            retArea.value = response.replace("SPEEDTNBBSCDE", " ");
+            retArea.scrollTop = retArea.scrollHeight;
+        },
+        error: function (xhr) {
+            E("ok_button").style.visibility = "visible";
+            return false;
+        }
+	});
+}
+
 function getRuntime()
 {
     var id2 = parseInt(Math.random() * 100000000);
@@ -234,7 +312,7 @@ function manualSpeedUp()
             async: true,
             data: JSON.stringify(postData),
             beforeSend:function (){
-                $('#mSup').attr('disabled','disabled');
+                manualResetControl(60);
             },
             success: function(response) {
                 var arr = response.result.split("@");
@@ -244,34 +322,48 @@ function manualSpeedUp()
                     E("tisu_status_6").innerHTML = arr[2];
                     E("warning").innerHTML       = arr[3];
                 }
-                t = setInterval(function () {
-                    time--;
-                    $('#mSup').val('冷却中,剩余 '+time+' 秒');
-                    if(time <= 0)
-                    {
-                        $('#mSup').removeAttr('disabled');
-                        $('#mSup').val('手动提速');
-                        $('#warning').html('');
-                        time = setTime;
-                        clearInterval(t);
-                    }
-                },1000);
             },
             error:function(){
-                $('#mSup').val('手动提速');
-                $('#warning').html('');
-                $('#mSup').removeAttr('disabled');
-                clearInterval(t);
+
             }
         });
     }
     else
     {
+        manualResetControl(60);
+    }
+}
+var timeinter;
+function manualResetControl(time)
+{
+    var resetTime = 0;
+    var timestamp = (parseInt(Date.parse(new Date()))/1000);
+    if(time)
+    {
+        timestamp += time;
+        document.cookie ="speedtestcnauto_reset_time" + "=" + timestamp + ";expires=70";//"Name"是键,escape(是值)
+        resetTime = parseInt(time);
+        clearInterval(timeinter);
+        timeinter='';
+    }
+    else
+    {
+        var resetTimeCookie = document.cookie.match(
+            new RegExp("(^| )" + "speedtestcnauto_reset_time" + "=([^;]*)(;|$)")
+        );
+        if(resetTimeCookie)
+        {
+            resetTime = parseInt(resetTimeCookie[2]) - timestamp;
+        }
+    }
+
+    if(resetTime && ! timeinter)
+    {
         $('#mSup').attr('disabled','disabled');
-        var timeinter = setInterval(function () {
-            time--;
-            $('#mSup').val('冷却中,剩余 '+time+' 秒');
-            if(time <= 0)
+        timeinter = setInterval(function () {
+            resetTime--;
+            $('#mSup').val('冷却中,剩余 '+resetTime+' 秒');
+            if(resetTime <= 0)
             {
                 $('#mSup').removeAttr('disabled');
                 $('#mSup').val('手动提速');
@@ -279,7 +371,6 @@ function manualSpeedUp()
                 {
                     $('#warning').html('');
                 }
-                time = setTime;
                 clearInterval(timeinter);
             }
         },1000);
@@ -316,156 +407,217 @@ function testSpeedTest() {
     }
     document.body.appendChild(link)
 }
+
+function showLoadingBar(){
+    document.scrollingElement.scrollTop = 0;
+    E("loading_block_title").innerHTML = "wifi boost 运行中，请稍后 ...";
+    E("LoadingBar").style.visibility = "visible";
+    var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var log_h = E("loadingBarBlock").clientHeight;
+    var log_w = E("loadingBarBlock").clientWidth;
+    var log_h_offset = (page_h - log_h) / 2;
+    var log_w_offset = (page_w - log_w) / 2 + 90;
+    $('#loadingBarBlock').offset({top: log_h_offset, left: log_w_offset});
+}
+
+function hideWBLoadingBar(){
+    E("LoadingBar").style.visibility = "hidden";
+    E("ok_button").style.visibility = "hidden";
+    if (refresh_flag == "1"){
+        var newURL = location.href.split("?")[0];
+        window.history.pushState('object', document.title, newURL);
+        refreshpage();
+    }
+}
+
+function count_down_close() {
+    if (count_down == "0") {
+        hideWBLoadingBar();
+    }
+    if (count_down < 0) {
+        E("ok_button1").value = "手动关闭"
+        return false;
+    }
+    E("ok_button1").value = "自动关闭（" + count_down + "）"
+    --count_down;
+    setTimeout("count_down_close();", 1000);
+}
 </script>
 </head>
 <body onload="init();">
 	<div id="TopBanner"></div>
 	<div id="Loading" class="popup_bg"></div>
-	<iframe name="hidden_frame" id="hidden_frame" src="" width="0" height="0" frameborder="0"></iframe>
-		<table class="content" align="center" cellpadding="0" cellspacing="0">
-			<tr>
-				<td width="17">&nbsp;</td>
-				<td valign="top" width="202">
-					<div id="mainMenu"></div>
-					<div id="subMenu"></div>
-				</td>
-				<td valign="top">
-					<div id="tabMenu" class="submenuBlock"></div>
-					<table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
-						<tr>
-							<td align="left" valign="top">
-								<table width="760px" border="0" cellpadding="5" cellspacing="0" bordercolor="#6b8fa3" class="FormTitle" id="FormTitle">
-									<tr>
-										<td bgcolor="#4D595D" colspan="3" valign="top">
-											<div>&nbsp;</div>
-											<div class="formfonttitle">软件中心 - 宽带自动提速</div>
-											<div style="float:right; width:15px; height:25px;margin-top:-20px">
-												<img id="return_btn" onclick="reload_Soft_Center();" align="right" style="cursor:pointer;position:absolute;margin-left:-30px;margin-top:-25px;" title="返回软件中心" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'"></img>
-											</div>
-											<div style="margin:10px 0 10px 5px;" class="splitLine"></div>
-											<div class="SimpleNote">
-												<li>本插件帮你实现开通宽带提速后,在您的外网IP变化后自动帮你执行提速操作 ，<a href="http://www.everstu.com/" target="_blank"><em><u>程序</u></em></a>来自Everstu.com。<a type="button" style="cursor:pointer" href="#"><em>【<u>插件更新日志(暂无)</u>】</em></a>
-											</div>
-											<div id="tablets">
-												<table style="margin:10px 0px 0px 0px;border-collapse:collapse" width="100%" height="37px">
-													<tr width="400px">
-														<td colspan="4" cellpadding="0" cellspacing="0" style="padding:0" border="1" bordercolor="#000">
-															<input id="show_btn1" class="show-btn show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
-															<input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
-															<input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
-															<a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
-														</td>
-													</tr>
-												</table>
-											</div>
-											<div id="kuandai_speed_status">
-												<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                    <tr>
-                                                        <th style="width:18%">
-                                                            <label>宽带能否提速</label>
-                                                        </th>
-                                                        <td id="tisu_status_1">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-													<tr>
-														<th style="width:18%">
-															<label>是否开通提速</label>
-														</th>
-                                                            <td id="tisu_status_2">
-															未开通提速套餐
-														</td>
-													</tr>
-                                                    <tr>
-                                                        <th style="width:18%">宽带提速有效期</th>
-                                                        <td id="tisu_status_7">
-                                                            未开通提速套餐
-                                                        </td>
-                                                    </tr>
-													<tr>
-														<th style="width:18%">前台查询IP地址</th>
-														<td id="tisu_status_3">
-														    未查询到IP地址
-														</td>
-													</tr>
-													<tr>
-														<th style="width:18%">后台查询IP地址</th>
-														<td id="tisu_status_6">
-                                                             等待程序运行 - Waiting for first refresh...
-														</td>
-													</tr>
-													<tr>
-														<th style="width:18%">最后运行时间</th>
-														<td id="tisu_status_4">
-                                                             等待程序运行 - Waiting for first refresh...
-														</td>
-													</tr>
-													<tr>
-														<th style="width:18%">最后提速时间</th>
-														<td id="tisu_status_5">
-                                                             等待程序运行 - Waiting for first refresh...
-														</td>
-													</tr>
-												</table>
-											</div>
-											<div id="kuandai_info_status" style="display:none;">
-											    <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
-                                                    <tr>
-                                                        <th style="width:18%">
-                                                            <label>宽带能否提速</label>
-                                                        </th>
-                                                        <td id="tisu_info_1">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th style="width:18%">宽带提速信息</th>
-                                                        <td id="tisu_info_2">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th style="width:18%">宽带基本速率</th>
-                                                        <td id="tisu_info_3">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th style="width:18%">宽带升级后速率</th>
-                                                        <td id="tisu_info_4">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th style="width:18%">宽带提速有效期</th>
-                                                        <td id="tisu_info_5">
-                                                            当前宽带不支持提速
-                                                        </td>
-                                                    </tr>
-                                                </table>
-											</div>
-											<div id="kuandai_speedtest" style="display:none;">
-											    <iframe id="internetSpeed_iframe" style="width: 100%; border: none;" src=""></iframe>
-											</div>
-											<div style="margin:10px 0 10px 5px;" class="splitLine"></div>
-											<div id="warning" style="font-size:14px;margin:20px auto;text-align:center;color:yellow;"></div>
-											<div class="apply_gen">
-												<input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" />
-											</div>
-											<div class="SimpleNote">
-												<li>如果使用中提速有任何问题,可以点击<a href="javascript:void();" onClick="manualSpeedUp();"><em><u>手动提速</u></em></a>来清除所有插件缓存,重新触发提速</li>
-												<li>插件使用有任何问题请加入<a href="https://t.me/xbchat" target="_blank"><em><u>koolcenter TG群</u></em></a>联系@fiswonder</li>
-											</div>
-										</td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-					</table>
-				</td>
-				<td width="10" align="center" valign="top"></td>
-			</tr>
-		</table>
+    <div id="LoadingBar" class="popup_bar_bg_ks" style="z-index: 200;" >
+        <table cellpadding="5" cellspacing="0" id="loadingBarBlock" class="loadingBarBlock" align="center">
+            <tr>
+                <td height="100">
+                    <div id="loading_block_title" style="margin:10px auto;margin-left:10px;width:85%; font-size:12pt;"></div>
+                    <div id="loading_block_spilt" style="margin:10px 0 10px 5px;" class="loading_block_spilt">
+                        <li><font color="#ffcc00">请等待日志显示完毕，并出现自动关闭按钮！</font></li>
+                        <li><font color="#ffcc00">在此期间请不要刷新本页面，不然可能导致问题！</font></li>
+                    </div>
+                    <div style="margin-left:15px;margin-right:15px;margin-top:10px;overflow:hidden">
+                        <textarea cols="50" rows="25" wrap="off" readonly="readonly" id="log_content" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="border:1px solid #000;width:99%; font-family:'Lucida Console'; font-size:11px;background:transparent;color:#FFFFFF;outline: none;padding-left:3px;padding-right:22px;overflow-x:hidden"></textarea>
+                    </div>
+                    <div id="ok_button" class="apply_gen" style="background:#000;visibility:hidden;">
+                        <input id="ok_button1" class="button_gen" type="button" onclick="hideWBLoadingBar()" value="确定">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <table class="content" align="center" cellpadding="0" cellspacing="0">
+        <tr>
+            <td width="17">&nbsp;</td>
+            <td valign="top" width="202">
+                <div id="mainMenu"></div>
+                <div id="subMenu"></div>
+            </td>
+            <td valign="top">
+                <div id="tabMenu" class="submenuBlock"></div>
+                <table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td align="left" valign="top">
+                            <table width="760px" border="0" cellpadding="5" cellspacing="0" bordercolor="#6b8fa3" class="FormTitle" id="FormTitle">
+                                <tr>
+                                    <td bgcolor="#4D595D" colspan="3" valign="top">
+                                        <div>&nbsp;</div>
+                                        <div class="formfonttitle">软件中心 - 宽带自动提速</div>
+                                        <div style="float:right; width:15px; height:25px;margin-top:-20px">
+                                            <img id="return_btn" onclick="reload_Soft_Center();" align="right" style="cursor:pointer;position:absolute;margin-left:-30px;margin-top:-25px;" title="返回软件中心" src="/images/backprev.png" onMouseOver="this.src='/images/backprevclick.png'" onMouseOut="this.src='/images/backprev.png'"></img>
+                                        </div>
+                                        <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
+                                        <div class="SimpleNote">
+                                            <li>本插件帮你实现开通宽带提速后,在您的外网IP变化后自动帮你执行提速操作 ，<a href="http://www.everstu.com/" target="_blank"><em><u>程序</u></em></a>来自Everstu.com。<a type="button" style="cursor:pointer" href="#"><em>【<u>插件更新日志(暂无)</u>】</em></a>
+                                        </div>
+                                        <div id="tablets">
+                                            <table style="margin:10px 0px 0px 0px;border-collapse:collapse" width="100%" height="37px">
+                                                <tr width="400px">
+                                                    <td colspan="4" cellpadding="0" cellspacing="0" style="padding:0" border="1" bordercolor="#000">
+                                                        <input id="show_btn1" class="show-btn show-btn1" style="cursor:pointer" type="button" value="宽带提速状态" />
+                                                        <input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
+                                                        <input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
+                                                        <a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
+                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="versionUpdate();">有新版本:<font color="red">v1.2</font>(点击更新)</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="kuandai_speed_status">
+                                            <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                                <tr>
+                                                    <th style="width:18%">
+                                                        <label>宽带能否提速</label>
+                                                    </th>
+                                                    <td id="tisu_status_1">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">
+                                                        <label>是否开通提速</label>
+                                                    </th>
+                                                        <td id="tisu_status_2">
+                                                        未开通提速套餐
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">宽带提速有效期</th>
+                                                    <td id="tisu_status_7">
+                                                        未开通提速套餐
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">前台查询IP地址</th>
+                                                    <td id="tisu_status_3">
+                                                        未查询到IP地址
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">后台查询IP地址</th>
+                                                    <td id="tisu_status_6">
+                                                         等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">最后运行时间</th>
+                                                    <td id="tisu_status_4">
+                                                         等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">最后提速时间</th>
+                                                    <td id="tisu_status_5">
+                                                         等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">手动提速操作</th>
+                                                    <td>
+                                                         <input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="kuandai_info_status" style="display:none;">
+                                            <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+                                                <tr>
+                                                    <th style="width:18%">
+                                                        <label>宽带能否提速</label>
+                                                    </th>
+                                                    <td id="tisu_info_1">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">宽带提速信息</th>
+                                                    <td id="tisu_info_2">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">宽带基本速率</th>
+                                                    <td id="tisu_info_3">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">宽带升级后速率</th>
+                                                    <td id="tisu_info_4">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">宽带提速有效期</th>
+                                                    <td id="tisu_info_5">
+                                                        当前宽带不支持提速
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="kuandai_speedtest" style="display:none;">
+                                            <iframe id="internetSpeed_iframe" style="width: 100%; border: none;" src=""></iframe>
+                                        </div>
+                                        <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
+                                        <div id="warning" style="font-size:14px;margin:20px auto;text-align:center;color:yellow;"></div>
+                                        <div class="apply_gen">
+<!-- 												<input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" /> -->
+                                        </div>
+                                        <div class="SimpleNote">
+                                            <li>如果使用中提速有任何问题,可以点击<a href="javascript:void();" onClick="manualSpeedUp();"><em><u>手动提速</u></em></a>来清除所有插件缓存,重新触发提速</li>
+                                            <li>插件使用有任何问题请加入<a href="https://t.me/xbchat" target="_blank"><em><u>koolcenter TG群</u></em></a>联系@fiswonder</li>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="10" align="center" valign="top"></td>
+        </tr>
+    </table>
 	<div id="footer"></div>
 </body>
 </html>

@@ -11,6 +11,7 @@ querydatalog="${runtimeDir}querydatalog"
 tisudatalog="${runtimeDir}tisudatalog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
+LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
 can_speed="0"
 
 start_reopen(){
@@ -88,6 +89,15 @@ add_cron(){
   cru a speedtestcnauto_main "*/5 * * * * /bin/sh /koolshare/scripts/speedtestcnauto_main.sh reopen"
 }
 
+self_upgrade(){
+  # shellcheck disable=SC2036
+  # shellcheck disable=SC2030
+  version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
+  new_version=$(echo "${version_info}" | jq_speed .version)
+  old_version=$(dbus get softcenter_module_speedtestcnauto_version)
+  echo_date "当前版本:${old_version},新版本:${new_version}"
+}
+
 case $1 in
 start)
 	# 开机启动
@@ -98,6 +108,13 @@ reopen)
   start_reopen
   ;;
 *)#web提交
+  if [ "${2}" = "update" ];then
+    echo "" > $LOGFILE
+    http_response "$1"
+    self_upgrade
+    exit;
+  fi
+  #手动提速
   if [ "${2}" = "reopen" ];then
     #清理缓存文件
     rm -rf ${runtimeDir}*
