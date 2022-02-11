@@ -113,8 +113,12 @@ self_upgrade(){
          echo_date "校验MD5为:${checkMd5}" >> $LOGFILE
          # shellcheck disable=SC1009
          if [ "$newFileMd5" = "$checkMd5" ];then
-            chmod +x /tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh >/dev/null 2>&1
-            start-stop-daemon -S -q -x /tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh 2>&1
+            echo_date "MD5校验通过,开始更新..." >> $LOGFILE
+            echo_date "开始解压文件..." >> $LOGFILE
+            tar xzvf "/tmp/speedtestcnauto_up/speedtestcnauto.tar.gz"
+            echo_date "文件解压成功..." >> $LOGFILE
+            chmod +x "/tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh"
+            start-stop-daemon -S -q -x "/tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh" 2>&1
            else
             echo_date "文件MD5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
          fi
