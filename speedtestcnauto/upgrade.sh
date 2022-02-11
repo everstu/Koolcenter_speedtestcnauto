@@ -17,36 +17,6 @@ get_model(){
 	fi
 }
 
-get_fw_type() {
-	local KS_TAG=$(nvram get extendno|grep koolshare)
-	if [ -d "/koolshare" ];then
-		if [ -n "${KS_TAG}" ];then
-			FW_TYPE_CODE="2"
-			FW_TYPE_NAME="koolshare官改固件"
-		else
-			FW_TYPE_CODE="4"
-			FW_TYPE_NAME="koolshare梅林改版固件"
-		fi
-	else
-		if [ "$(uname -o|grep Merlin)" ];then
-			FW_TYPE_CODE="3"
-			FW_TYPE_NAME="梅林原版固件"
-		else
-			FW_TYPE_CODE="1"
-			FW_TYPE_NAME="华硕官方固件"
-		fi
-	fi
-}
-
-platform_test(){
-	local LINUX_VER=$(uname -r|awk -F"." '{print $1$2}')
-	if [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -eq "26" ] || [ -d "/koolshare" -a -f "/usr/bin/skipd" -a "${LINUX_VER}" -ge "41" ];then
-		echo_date "机型：${MODEL} ${FW_TYPE_NAME} 符合安装要求，开始安装插件！"
-	else
-		exit_install 1
-	fi
-}
-
 get_ui_type(){
 	# default value
 	[ "${MODEL}" == "RT-AC86U" ] && local ROG_RTAC86U=0
@@ -86,42 +56,25 @@ get_ui_type(){
 	fi
 }
 
-exit_install(){
-	local state=$1
-	case $state in
-		1)
-			echo_date "本插件适用于【koolshare merlin armv7l 384/386】和【koolshare 梅林改/官改 hnd/axhnd/axhnd.675x】固件平台！"
-			echo_date "你的固件平台不能安装！！!"
-			echo_date "本插件支持机型/平台1：https://github.com/koolshare/armsoft#armsoft"
-			echo_date "本插件支持机型/平台2：https://github.com/koolshare/rogsoft#rogsoft"
-			echo_date "退出安装！"
-			rm -rf /tmp/${module}* >/dev/null 2>&1
-			exit 1
-			;;
-		0|*)
-			rm -rf /tmp/${module}* >/dev/null 2>&1
-			exit 0
-			;;
-	esac
-}
 
 install_ui(){
 	# intall different UI
 	get_ui_type
 	if [ "${UI_TYPE}" == "ROG" ];then
 		echo_date "安装ROG皮肤！"
-		sed -i '/asuscss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
+		sed -i '/asuscss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 	if [ "${UI_TYPE}" == "TUF" ];then
 		echo_date "安装TUF皮肤！"
-		sed -i '/asuscss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
-		sed -i 's/3e030d/3e2902/g;s/91071f/92650F/g;s/680516/D0982C/g;s/cf0a2c/c58813/g;s/700618/74500b/g;s/530412/92650F/g' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
+		sed -i '/asuscss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
+		sed -i 's/3e030d/3e2902/g;s/91071f/92650F/g;s/680516/D0982C/g;s/cf0a2c/c58813/g;s/700618/74500b/g;s/530412/92650F/g' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 	if [ "${UI_TYPE}" == "ASUSWRT" ];then
 		echo_date "安装ASUSWRT皮肤！"
-		sed -i '/rogcss/d' /koolshare/webs/Module_${module}.asp >/dev/null 2>&1
+		sed -i '/rogcss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 }
+
 install_now(){
   tmpDir="/tmp/upload/speedtestcnauto_up/"
   version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
@@ -143,19 +96,18 @@ install_now(){
   cp -rf ${tmpDir}speedtestcnauto/webs/* /koolshare/webs/
   cp -rf ${tmpDir}speedtestcnauto/uninstall.sh /koolshare/scripts/uninstall_speedtestcnauto.sh
   echo_date "复制成功,开始写入版本号:${new_version}..." >> $LOGFILE
-  dbus remove softcenter_module_speedtestcnauto_version
   dbus set softcenter_module_speedtestcnauto_version="${new_version}"
   echo_date "版本号写入完成,启用插件中..." >> $LOGFILE
   /bin/sh /koolshare/scripts/speedtestcnauto_main.sh start >/dev/null 2>&1
   echo_date "插件启用成功..." >> $LOGFILE
   echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
 	install_ui
+  rm -rf $tmpDir >/dev/null 2>&1
 }
 
 install(){
 	get_model
-	get_fw_type
-	platform_test
+	get_ui_type
 	install_now
 }
 

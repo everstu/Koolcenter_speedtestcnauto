@@ -148,7 +148,6 @@ install_now(){
 	cp -rf /tmp/${module}/scripts/* /koolshare/scripts/
 	cp -rf /tmp/${module}/webs/* /koolshare/webs/
 	cp -rf /tmp/${module}/uninstall.sh /koolshare/scripts/uninstall_${module}.sh
-	cp -rf /tmp/${module}/upgrade.sh /koolshare/scripts/upgrade_${module}.sh
 
 	# Permissions
 	chmod 755 /koolshare/${module}/* >/dev/null 2>&1
