@@ -90,18 +90,22 @@ add_cron(){
 }
 
 self_upgrade(){
-  echo_date "检查版本更新中...">>$LOGFILE
-   version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
+   versionapi="https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info"
+   echo_date "检查版本更新中...">>$LOGFILE
+   version_info=$(curl -s -m 10 "$versionapi")
    new_version=$(echo "${version_info}" | jq_speed .version)
    old_version=$(dbus get "softcenter_module_speedtestcnauto_version")
    # shellcheck disable=SC2154
    # shellcheck disable=SC2046
    if [ $(expr "$new_version" \> "$old_version") -eq 1 ];then
+
        tmpDir="/tmp/upload/speedtestcnauto_up/"
        mkdir -p $tmpDir
        echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
-       echo_date "下载资源新版本资源..."
-       wget -O ${tmpDir}speedtestcnauto.tar.gz https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/speedtestcnauto.tar.gz >> $LOGFILE
+       echo_date "下载资源新版本资源..." >> $LOGFILE
+       versionfile=$(echo "${version_info}"|jq_speed .fileurl |sed 's/\"//g')
+       echo_date "${versionfile}" >> $LOGFILE
+       wget -O ${tmpDir}speedtestcnauto.tar.gz "${versionfile}"
        if [ -f "${tmpDir}speedtestcnauto.tar.gz" ];then
          # shellcheck disable=SC2129
          echo_date "新版本下载成功.." >> $LOGFILE
