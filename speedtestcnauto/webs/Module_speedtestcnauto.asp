@@ -156,6 +156,7 @@ function checkVersion()
     }
     else
     {
+        $('#version_update').html('插件更新中');
         versionUpdate();
     }
 }
