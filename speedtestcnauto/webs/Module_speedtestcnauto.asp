@@ -103,9 +103,9 @@ function init() {
 
 function checkVersion()
 {
-    $('#version_update').html('检查更新中...');
     if(! has_new_version)
     {
+        $('#version_update').html('检查更新中...');
         $.ajax({
              type: "GET",
              url: "/_api/softcenter_module_speedtestcnauto_version",
