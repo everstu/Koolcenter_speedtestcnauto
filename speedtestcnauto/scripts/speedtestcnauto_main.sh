@@ -95,7 +95,47 @@ self_upgrade(){
   version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
   new_version=$(echo "${version_info}" | jq_speed .version)
   old_version=$(dbus get softcenter_module_speedtestcnauto_version)
-  echo_date "当前版本:${old_version},新版本:${new_version}"
+  # shellcheck disable=SC2154
+  if [ "$new_version" -gt "$old_vesion" ];then
+      tmpDir="/tmp/speedtestcnauto_up/"
+      mkdir -p $tmpDir
+      echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
+      echo_date "下载资源新版本资源..."
+      wget -O ${tmpDir}speedtestcnauto.tar.gz https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/speedtestcnauto.tar.gz >> $LOGFILE
+      if [ -f "${tmpDir}speedtestcnauto.tar.gz" ];then
+        # shellcheck disable=SC2129
+        echo_date "新版本下载成功.." >> $LOGFILE
+        echo_date "开始更新..." >> $LOGFILE
+        echo_date "停止脚本运行..." >> $LOGFILE
+        sed -i '/speedtestcnauto_main/d' /var/spool/cron/crontabs/* >/dev/null 2>&1
+        echo_date "替换旧文件..." >> $LOGFILE
+        rm -rf /koolshare/speedtestcnauto
+        rm -rf /koolshare/scripts/speedtestcnauto_main.sh
+        rm -rf /koolshare/webs/Module_speedtestcnauto.asp
+        rm -rf /koolshare/res/*speedtestcnauto*
+        rm -rf /koolshare/init.d/*speedtestcnauto.sh
+        rm -rf /koolshare/bin/jq_speed >/dev/null 2>&1
+        echo_date "复制新文件..." >> $LOGFILE
+        cp -f ${tmpDir}speedtestcnauto/bin/jq_speed /koolshare/bin/
+        chmod 755 /koolshare/bin/jq_speed >/dev/null 2>&1
+        cp -rf ${tmpDir}speedtestcnauto/res/* /koolshare/res/
+        cp -rf ${tmpDir}speedtestcnauto/scripts/* /koolshare/scripts/
+        cp -rf ${tmpDir}speedtestcnauto/webs/* /koolshare/webs/
+        cp -rf ${tmpDir}speedtestcnauto/uninstall.sh /koolshare/scripts/uninstall_speedtestcnauto.sh
+        echo_date "复制成功,写入版本号:${new_version}..." >> $LOGFILE
+        dbus remove softcenter_module_speedtestcnauto_version
+        dbus set softcenter_module_speedtestcnauto_version="${new_version}"
+        echo_date "版本号写入完成,启用插件中..." >> $LOGFILE
+        /bin/sh /koolshare/scripts/${module}_main.sh start >/dev/null 2>&1
+        echo_date "插件启用成功..." >> $LOGFILE
+        echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
+      else
+        echo_date "新版本资源下载失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
+      fi
+    else
+      echo_date "当前版本:${old_version} 是最新版本,无需更新!" >> $LOGFILE
+  fi
+  echo "SPEEDTNBBSCDE">>$LOGFILE
 }
 
 case $1 in
