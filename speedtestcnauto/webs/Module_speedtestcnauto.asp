@@ -23,24 +23,27 @@
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 <script type="text/javascript" src="/res/softcenter.js"></script>
 <style>
+.loadingBarBlock{
+    width:740px;
+}
 .popup_bar_bg_ks{
-position:fixed;
-margin: auto;
-top: 0;
-left: 0;
-width:100%;
-height:100%;
-z-index:99;
-/*background-color: #444F53;*/
-filter:alpha(opacity=90);  /*IE5、IE5.5、IE6、IE7*/
-background-repeat: repeat;
-visibility:hidden;
-overflow:hidden;
-/*background: url(/images/New_ui/login_bg.png);*/
-background:rgba(68, 79, 83, 0.85) none repeat scroll 0 0 !important;
-background-position: 0 0;
-background-size: cover;
-opacity: .94;
+    position:fixed;
+    margin: auto;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    z-index:99;
+    /*background-color: #444F53;*/
+    filter:alpha(opacity=90);  /*IE5、IE5.5、IE6、IE7*/
+    background-repeat: repeat;
+    visibility:hidden;
+    overflow:hidden;
+    /*background: url(/images/New_ui/login_bg.png);*/
+    background:rgba(68, 79, 83, 0.85) none repeat scroll 0 0 !important;
+    background-position: 0 0;
+    background-size: cover;
+    opacity: .94;
 }
 .show-btn{
 	border-radius: 5px 5px 0px 0px;
@@ -97,7 +100,6 @@ function init() {
 
 function versionUpdate()
 {
-    showLoadingBar();
     var id2 = parseInt(Math.random() * 100000000);
     var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update'], "fields": ""};
     $.ajax({
@@ -410,7 +412,7 @@ function testSpeedTest() {
 
 function showLoadingBar(){
     document.scrollingElement.scrollTop = 0;
-    E("loading_block_title").innerHTML = "wifi boost 运行中，请稍后 ...";
+    E("loading_block_title").innerHTML = "自动更新运行中，请稍后 ...";
     E("LoadingBar").style.visibility = "visible";
     var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
