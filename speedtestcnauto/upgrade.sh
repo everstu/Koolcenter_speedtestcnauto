@@ -123,7 +123,7 @@ install_ui(){
 	fi
 }
 install_now(){
-  tmpDir="/tmp/speedtestcnauto_up/"
+  tmpDir="/tmp/upload/speedtestcnauto_up/"
   version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
   new_version=$(echo "${version_info}" | jq_speed .version)
   echo_date "停止运行中脚本..." >> $LOGFILE

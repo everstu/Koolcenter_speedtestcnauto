@@ -97,7 +97,7 @@ self_upgrade(){
    # shellcheck disable=SC2154
    # shellcheck disable=SC2046
    if [ $(expr "$new_version" \> "$old_version") -eq 1 ];then
-       tmpDir="/tmp/speedtestcnauto_up/"
+       tmpDir="/tmp/upload/speedtestcnauto_up/"
        mkdir -p $tmpDir
        echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
        echo_date "下载资源新版本资源..."
@@ -115,7 +115,7 @@ self_upgrade(){
          if [ "$newFileMd5" = "$checkMd5" ];then
             echo_date "MD5校验通过,开始更新..." >> $LOGFILE
             echo_date "开始解压文件..." >> $LOGFILE
-            tar xzvf "/tmp/speedtestcnauto_up/speedtestcnauto.tar.gz"
+            tar xzvf ${tmpDir}speedtestcnauto.tar.gz
             echo_date "文件解压成功..." >> $LOGFILE
             chmod +x "/tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh"
             start-stop-daemon -S -q -x "/tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh" 2>&1
