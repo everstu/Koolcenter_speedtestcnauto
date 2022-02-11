@@ -96,6 +96,42 @@ function init() {
     queryTisu();
     getRuntime();
     manualResetControl();
+    checkVersion();
+}
+
+function checkVersion()
+{
+    $.ajax({
+         type: "GET",
+         url: "/_api/softcenter_module_speedtestcnauto_version",
+         async: true,
+         dataType: 'json',
+         success: function(response) {
+             if(response['result'][0]['softcenter_module_speedtestcnauto_version'])
+             {
+                var old_version = parseFloat(response['result'][0]['softcenter_module_speedtestcnauto_version']);
+                $.ajax({
+                         type: "GET",
+                         url: "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info",
+                         async: true,
+		                 dataType: 'json',
+                         success: function(response) {
+                             if(response['version'])
+                             {
+                                var new_version = parseFloat(response['version']);
+                                if(new_version > old_version)
+                                {
+                                     $('#version_update').html('<font color="yellow">有新版本:v<font color="red">' + new_version + '</font>(点击更新)</font>');
+                                     $('#version_update').click(function(){
+                                        versionUpdate();
+                                     });
+                                }
+                             }
+                         }
+                 });
+             }
+         }
+     });
 }
 
 function versionUpdate()
@@ -501,7 +537,7 @@ function count_down_close() {
                                                         <input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
                                                         <input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
                                                         <a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
-                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="versionUpdate();">有新版本:<font color="red">v1.2</font>(点击更新)</a>
+                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="javascript:void(0);">插件暂无更新</a>
                                                     </td>
                                                 </tr>
                                             </table>
