@@ -90,8 +90,41 @@ add_cron(){
 }
 
 self_upgrade(){
-  chmod +x /koolshare/scripts/upgrade_speedtestcnauto.sh >/dev/null 2>&1
-  start-stop-daemon -S -q -x /koolshare/scripts/upgrade_speedtestcnauto.sh 2>&1
+  echo_date "检查版本更新中...">>$LOGFILE
+   version_info=$(curl -s -m 10 "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info")
+   new_version=$(echo "${version_info}" | jq_speed .version)
+   old_version=$(dbus get "softcenter_module_speedtestcnauto_version")
+   # shellcheck disable=SC2154
+   # shellcheck disable=SC2046
+   if [ $(expr "$new_version" \> "$old_version") -eq 1 ];then
+       tmpDir="/tmp/speedtestcnauto_up/"
+       mkdir -p $tmpDir
+       echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
+       echo_date "下载资源新版本资源..."
+       wget -O ${tmpDir}speedtestcnauto.tar.gz https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/speedtestcnauto.tar.gz >> $LOGFILE
+       if [ -f "${tmpDir}speedtestcnauto.tar.gz" ];then
+         # shellcheck disable=SC2129
+         echo_date "新版本下载成功.." >> $LOGFILE
+         newFileMd5=$(md5sum ${tmpDir}speedtestcnauto.tar.gz|cut -d ' ' -f1)
+         echo_date "下载文件MD5为:${newFileMd5}" >> $LOGFILE
+         # shellcheck disable=SC2005
+         checkMd5=$(echo "${version_info}" |jq_speed .md5sum |sed 's/\"//g')
+         # shellcheck disable=SC2129
+         echo_date "校验MD5为:${checkMd5}" >> $LOGFILE
+         # shellcheck disable=SC1009
+         if [ "$newFileMd5" = "$checkMd5" ];then
+            chmod +x /tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh >/dev/null 2>&1
+            start-stop-daemon -S -q -x /tmp/speedtestcnauto_up/speedtestcnauto/upgrade.sh 2>&1
+           else
+            echo_date "文件MD5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
+         fi
+       else
+         echo_date "新版本资源下载失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
+       fi
+     else
+       echo_date "当前版本:v${old_version}newV${new_version}是最新版本,无需更新!" >> $LOGFILE
+   fi
+   echo "SPEEDTNBBSCDE">>$LOGFILE
 }
 
 case $1 in
