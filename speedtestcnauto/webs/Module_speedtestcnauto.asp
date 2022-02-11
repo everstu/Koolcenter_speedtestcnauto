@@ -87,6 +87,7 @@ var NEEDQUERY = true;
 var _responseLen;
 var refresh_flag;
 var count_down;
+var changeLog;
 
 function init() {
     testSpeedTest();
@@ -112,7 +113,8 @@ function checkVersion()
                 var old_version = parseFloat(response['result'][0]['softcenter_module_speedtestcnauto_version']);
                 $.ajax({
                          type: "GET",
-                         url: "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info",
+//                          url: "https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info",
+                         url: "http://192.168.50.168/index.php",
                          async: true,
 		                 dataType: 'json',
                          success: function(response) {
@@ -121,17 +123,58 @@ function checkVersion()
                                 var new_version = parseFloat(response['version']);
                                 if(new_version > old_version)
                                 {
-                                     $('#version_update').html('<font color="yellow">有新版本:v<font color="red">' + new_version + '</font>(点击更新)</font>');
-                                     $('#version_update').click(function(){
+                                    $('#version_update').html('<font color="yellow">有新版本:v<font color="red">' + new_version + '</font>(点击更新)</font>');
+                                    $('#version_update').click(function(){
                                         versionUpdate();
-                                     });
+                                    });
+                                }
+                                else
+                                {
+                                    $('#version_update').html('插件暂无更新');
                                 }
                              }
+                             if(response['change_log'])
+                             {
+                                changeLog = response['change_log'];
+                                console.log(changeLog);
+                                $('#soft_change_log').click(function(){
+                                    viewChangelog();
+                                });
+                             }
                          }
-                 });
+                });
+             }
+             else
+             {
+                $('#version_update').html('插件暂无更新');
              }
          }
      });
+}
+function viewChangelog()
+{
+    if(changeLog)
+    {
+        var num = 0;
+        var logHtml = '';
+        E("loading_block_spilt").style.visibility = "hidden";
+        E("ok_button").style.visibility = "visible";
+        showLoadingBar('插件更新日志');
+        var retArea = E("log_content");
+        $.each(changeLog,function (k,v){
+            if(num >= 10)
+            {
+                return ;
+            }
+            var note = '';
+            $.each(v.note,function(kk,vv) {
+                note+="- "+vv;
+            });
+            logHtml += "版本号：v" + v.version + "\n" + "更新内容：\n" + note + "\n\n";
+            num++;
+        });
+        retArea.value = logHtml;
+    }
 }
 
 function versionUpdate()
@@ -145,6 +188,7 @@ function versionUpdate()
         data: JSON.stringify(postData),
         success: function(response) {
             if (response.result == id2){
+                E("loading_block_spilt").style.visibility = "visible";
 			    get_realtime_log(0);
             }
         }
@@ -446,9 +490,9 @@ function testSpeedTest() {
     document.body.appendChild(link)
 }
 
-function showLoadingBar(){
+function showLoadingBar(title){
     document.scrollingElement.scrollTop = 0;
-    E("loading_block_title").innerHTML = "自动更新运行中，请稍后 ...";
+    E("loading_block_title").innerHTML = title ? title : "自动更新运行中，请稍后 ...";
     E("LoadingBar").style.visibility = "visible";
     var page_h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     var page_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -527,7 +571,7 @@ function count_down_close() {
                                         </div>
                                         <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
                                         <div class="SimpleNote">
-                                            <li>本插件帮你实现开通宽带提速后,在您的外网IP变化后自动帮你执行提速操作 ，<a href="http://www.everstu.com/" target="_blank"><em><u>程序</u></em></a>来自Everstu.com。<a type="button" style="cursor:pointer" href="#"><em>【<u>插件更新日志(暂无)</u>】</em></a>
+                                            <li>本插件帮你实现开通宽带提速后,在您的外网IP变化后自动帮你执行提速操作 ，<a href="http://www.everstu.com/" target="_blank"><em><u>程序</u></em></a>来自Everstu.com。<a id="soft_change_log" type="button" style="cursor:pointer" href="javascript:void(0);"><em>【<u>插件更新日志</u>】</em></a>
                                         </div>
                                         <div id="tablets">
                                             <table style="margin:10px 0px 0px 0px;border-collapse:collapse" width="100%" height="37px">
@@ -537,7 +581,7 @@ function count_down_close() {
                                                         <input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
                                                         <input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
                                                         <a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
-                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="javascript:void(0);">插件暂无更新</a>
+                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="javascript:void(0);">检查更新中...</a>
                                                     </td>
                                                 </tr>
                                             </table>
