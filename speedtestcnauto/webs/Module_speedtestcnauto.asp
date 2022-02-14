@@ -134,6 +134,7 @@ function checkVersion()
                                     else
                                     {
                                         $('#version_update').html('插件暂无更新');
+                                        $('#version_update_1').show();
                                     }
                                  }
                                  if(response['change_log'])
@@ -149,6 +150,7 @@ function checkVersion()
                  else
                  {
                     $('#version_update').html('插件暂无更新');
+                    $('#version_update_1').show();
                  }
              }
          });
@@ -156,7 +158,7 @@ function checkVersion()
     else
     {
         $('#version_update').html('插件更新中');
-        versionUpdate();
+        versionUpdate(0);
     }
 }
 
@@ -186,10 +188,12 @@ function viewChangelog()
     }
 }
 
-function versionUpdate()
+
+function versionUpdate(act)
 {
+    //act 0普通更新 1强制更新
     var id2 = parseInt(Math.random() * 100000000);
-    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update'], "fields": ""};
+    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update', act], "fields": ""};
     $.ajax({
         type: "POST",
         url: "/_api/",
@@ -590,7 +594,8 @@ function count_down_close() {
                                                         <input id="show_btn2" class="show-btn show-btn2" style="cursor:pointer" type="button" value="宽带信息查询" />
                                                         <input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
                                                         <a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
-                                                        <a id="version_update" style="cursor:pointer" type="button" onClick="checkVersion();">检查更新中...</a>
+                                                        <a id="version_update" class="show-btn" style="cursor:pointer" type="button" onClick="checkVersion();">检查更新中...</a>
+                                                        <a id="version_update_1" class="show-btn" style="cursor:pointer" type="button" onClick="versionUpdate(1);" style="display:none;">强行更新插件</a>
                                                     </td>
                                                 </tr>
                                             </table>

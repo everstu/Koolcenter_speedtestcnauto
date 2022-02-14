@@ -91,16 +91,24 @@ add_cron(){
 
 self_upgrade(){
    versionapi="https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info"
-   echo_date "检查版本更新中...">>$LOGFILE
+   if [ "${1}" ];then
+     echo_date "开始强制更新,获取最新版本中..." >> $LOGFILE
+   else
+     echo_date "检查版本更新中...">>$LOGFILE
+   fi
    version_info=$(curl -s -m 10 "$versionapi")
    new_version=$(echo "${version_info}" | jq_speed .version)
    old_version=$(dbus get "softcenter_module_speedtestcnauto_version")
    # shellcheck disable=SC2154
    # shellcheck disable=SC2046
-   if [ $(expr "$new_version" \> "$old_version") -eq 1 ];then
+   if [ $(expr "$new_version" \> "$old_version") -eq 1 ] || [ "${1}" ];then
        tmpDir="/tmp/upload/speedtestcnauto_up/"
        mkdir -p $tmpDir
-       echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
+       if [ "${1}" ];then
+         echo_date "开始强制更新,如有更新后有异常,请重新离线安装插件..." >> $LOGFILE
+       else
+         echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
+       fi
        echo_date "下载资源新版本资源..." >> $LOGFILE
        versionfile=$(echo "${version_info}"|jq_speed .fileurl |sed 's/\"//g')
        wget --no-cache -O ${tmpDir}speedtestcnauto.tar.gz "${versionfile}"
@@ -147,7 +155,12 @@ reopen)
   if [ "${2}" = "update" ];then
     echo "" > $LOGFILE
     http_response "$1"
-    self_upgrade
+    if [ "${3}" = '1' ];then
+      #强制更新
+      self_upgrade 1
+    else
+      self_upgrade 0
+    fi
     exit;
   fi
   #手动提速
