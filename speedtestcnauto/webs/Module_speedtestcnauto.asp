@@ -545,6 +545,7 @@ function showLoadingBar(title){
 }
 
 function hideWBLoadingBar(){
+    E("loading_block_spilt").style.visibility = "hidden";
     E("LoadingBar").style.visibility = "hidden";
     E("ok_button").style.visibility = "hidden";
     if (refresh_flag == "1"){
