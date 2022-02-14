@@ -13,13 +13,14 @@ queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
 can_speed="0"
+query_data="";
 
 start_reopen(){
     # shellcheck disable=SC2046
     # shellcheck disable=SC2005
     echo $(date '+%Y-%m-%d %H:%M:%S') >$runtimelog
     tisumessage="<font color='yellow'>当前宽带不支持提速</font>"
-    query_data=$(curl -m 20 -s "$queryapi")
+    queryStatus
     if [ "$query_data" ]; then
         echo "$query_data" >$querydatalog
         #获取是否能提速
@@ -92,7 +93,7 @@ add_cron(){
 self_upgrade(){
    versionapi="https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info"
    if [ "${1}" ];then
-     echo_date "开始强制更新,获取最新版本中..." >> $LOGFILE
+     echo_date "获取最新版本中..." >> $LOGFILE
    else
      echo_date "检查版本更新中...">>$LOGFILE
    fi
@@ -142,6 +143,10 @@ self_upgrade(){
    echo "SPEEDTNBBSCDE">>$LOGFILE
 }
 
+queryStatus(){
+  query_data=$(curl -m 20 -s "$queryapi")
+}
+
 case $1 in
 start)
 	# 开机启动
@@ -162,6 +167,11 @@ reopen)
       self_upgrade 0
     fi
     exit;
+  fi
+  if [ "${2}" = "query" ];then
+    queryStatus
+    # shellcheck disable=SC2046
+    http_response $(echo "$query_data"|base64_encode)
   fi
   #手动提速
   if [ "${2}" = "reopen" ];then

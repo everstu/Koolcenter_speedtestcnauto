@@ -336,12 +336,15 @@ function menu_hook(title, tab) {
 function queryTisu()
 {
     $.ajax({
-        url: "https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index",
+//         url: "https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index",
+//         type: "GET",
+        url: "/_api/",
+        data: JSON.stringify({"id": parseInt(Math.random() * 100000000), "method": "speedtestcnauto_main.sh", "params":['query'], "fields": ""}),
+        type:"POST",
         cache: false,
-        type: "GET",
         async: false,
-        dataType: "json",
-        success: function(res) {
+        success: function(response) {
+            var res = JSON.parse(window.atob(response['result']));
             if(res.hasOwnProperty('data'))
             {
                 var data = res.data;
