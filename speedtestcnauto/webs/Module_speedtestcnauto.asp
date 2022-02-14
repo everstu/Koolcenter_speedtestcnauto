@@ -162,6 +162,17 @@ function checkVersion()
         $('#version_update').html('插件更新中');
         versionUpdate(0);
     }
+
+    $('#version_update_1').hover(
+        function () {
+            $(this).css("color",'#ff3300');
+            $(this).html('强行更新插件');
+        },
+        function () {
+            $(this).css("color",'#00ffe4');
+            $(this).html('插件暂无更新');
+        }
+    );
 }
 
 function viewChangelog()
@@ -597,7 +608,7 @@ function count_down_close() {
                                                         <input id="show_btn3" class="show-btn show-btn3" style="cursor:pointer" type="button" value="网络测速(本地)">
                                                         <a id="show_btn4" class="show-btn show-btn4" style="cursor:pointer" type="button" value="" href="https://www.speedtest.net" target="_blank">网络测速(在线)</a>
                                                         <a id="version_update" class="show-btn" style="cursor:pointer" type="button" onClick="checkVersion();">检查更新中...</a>
-                                                        <a id="version_update_1" class="show-btn" style="cursor:pointer;display:none;" type="button" onClick="versionUpdate(1);">强行更新插件</a>
+                                                        <a id="version_update_1" class="show-btn" style="cursor:pointer;color:#00ffe4;display:none;" type="button" onClick="versionUpdate(1);">插件暂无更新</a>
                                                     </td>
                                                 </tr>
                                             </table>
