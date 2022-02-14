@@ -192,7 +192,7 @@ function viewChangelog()
             }
             var note = '';
             $.each(v.note,function(kk,vv) {
-                note+="- "+vv;
+                note+="- " + vv + "\n";
             });
             logHtml += "版本号：v" + v.version + "\n" + "更新内容：\n" + note + "\n\n";
             num++;
