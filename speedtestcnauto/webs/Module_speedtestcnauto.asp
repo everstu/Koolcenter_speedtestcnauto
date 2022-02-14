@@ -95,7 +95,7 @@ function init() {
 	show_menu(menu_hook);
     showTab();
 	tab_switch();
-    queryTisu();
+    queryTisu(0);
     getRuntime();
     manualResetControl();
     checkVersion();
@@ -333,18 +333,29 @@ function menu_hook(title, tab) {
 	tablink[tablink.length - 1] = new Array("", "Module_speedtestcnauto.asp");
 }
 
-function queryTisu()
+function queryTisu(act)
 {
+    var apiurl = 'https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index';
+    var methon_type = 'GET';
+    var postData = '';
+    if(act == 1)
+    {
+        apiurl = '/_api/';
+        methon_type = 'POST';
+        postData = JSON.stringify({"id": parseInt(Math.random() * 100000000), "method": "speedtestcnauto_main.sh", "params":['query'], "fields": ""});
+    }
     $.ajax({
-//         url: "https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index",
-//         type: "GET",
-        url: "/_api/",
-        data: JSON.stringify({"id": parseInt(Math.random() * 100000000), "method": "speedtestcnauto_main.sh", "params":['query'], "fields": ""}),
-        type:"POST",
+        url: apiurl,
+        type: methon_type,
+        data: postData,
         cache: false,
         async: false,
         success: function(response) {
-            var res = JSON.parse(window.atob(response['result']));
+            var res = response;
+            if(act == 1)
+            {
+                res = JSON.parse(window.atob(response['result']));
+            }
             if(res.hasOwnProperty('data'))
             {
                 var data = res.data;
@@ -384,6 +395,7 @@ function queryTisu()
                         CANSPEED = false;
                         $('#tisu_status_1').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_2').html(formatTextColor('当前宽带不支持提速',1));
+                        $('#tisu_status_7').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_1').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_2').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_3').html(formatTextColor('当前宽带不支持提速',1));
@@ -409,7 +421,7 @@ function formatTextColor(text, color)
 
 function manualSpeedUp()
 {
-    queryTisu();
+    queryTisu(1);
     var setTime = 60;
     var time = setTime;
     if(CANSPEED)//不支持提速就不要点了.
@@ -623,7 +635,7 @@ function count_down_close() {
                                                         <label>宽带能否提速</label>
                                                     </th>
                                                     <td id="tisu_status_1">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -631,19 +643,19 @@ function count_down_close() {
                                                         <label>是否开通提速</label>
                                                     </th>
                                                         <td id="tisu_status_2">
-                                                        未开通提速套餐
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带提速有效期</th>
                                                     <td id="tisu_status_7">
-                                                        未开通提速套餐
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">前台查询IP地址</th>
                                                     <td id="tisu_status_3">
-                                                        未查询到IP地址
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -679,31 +691,31 @@ function count_down_close() {
                                                         <label>宽带能否提速</label>
                                                     </th>
                                                     <td id="tisu_info_1">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带提速信息</th>
                                                     <td id="tisu_info_2">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带基本速率</th>
                                                     <td id="tisu_info_3">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带升级后速率</th>
                                                     <td id="tisu_info_4">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带提速有效期</th>
                                                     <td id="tisu_info_5">
-                                                        当前宽带不支持提速
+                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                             </table>

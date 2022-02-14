@@ -168,6 +168,7 @@ reopen)
     fi
     exit;
   fi
+  #查询宽带提速状态,后端查询
   if [ "${2}" = "query" ];then
     queryStatus
     # shellcheck disable=SC2046
@@ -184,6 +185,12 @@ reopen)
       tisutips="当前宽带不支持提速<br>目前仅支持电信,联通,具体是否支持,请以此显示结果为准<br>本插件对你来说没有任何作用啦,你可以卸载本插件啦."
     fi
   fi
+#  if [ "${2}" = 'status' ];then
+#    if [ "${3}" == 1 ];then
+#      queryStatus
+#      can_speed=$(echo "${query_data}" | jq_speed .data.status.can_speed)
+#    fi
+#  fi
   #查询状态
   runtime=$(cat $runtimelog)
   tisutime=$(cat $tisutimelog)
