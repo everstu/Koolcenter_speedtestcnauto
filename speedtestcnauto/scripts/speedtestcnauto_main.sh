@@ -1,6 +1,7 @@
 #!/bin/sh
 # shellcheck disable=SC2039
 source /koolshare/scripts/base.sh
+alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
 runtimeDir="/koolshare/speedtestcnauto/runtime/"
 mkdir -p $runtimeDir
 lastwaniptxt="${runtimeDir}lastwanip"
@@ -12,14 +13,18 @@ tisudatalog="${runtimeDir}tisudatalog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
+tisuactlog="/tmp/upload/speedtestcnauto_tisuactlog"
 can_speed="0"
 query_data="";
 
+# shellcheck disable=SC2120
 start_reopen(){
     # shellcheck disable=SC2046
     # shellcheck disable=SC2005
     echo $(date '+%Y-%m-%d %H:%M:%S') >$runtimelog
     tisumessage="<font color='yellow'>当前宽带不支持提速</font>"
+
+    #查询接口
     queryStatus
     if [ "$query_data" ]; then
         echo "$query_data" >$querydatalog
@@ -35,10 +40,12 @@ start_reopen(){
             #检查是否需要执行提速
             # shellcheck disable=SC2086
             down_expire_t=$(echo "${query_data}" | jq_speed .data.down_expire_t)
-            # shellcheck disable=SC2006
             down_expire_trial_t=$(echo "${query_data}" | jq_speed .data.down_expire_trial_t)
             up_expire_t=$(echo "${query_data}" | jq_speed .data.up_expire_t)
-            if [ "$down_expire_t" -eq "0" ] && [ "$down_expire_trial_t" -eq "0" ] && [ "$up_expire_t" -eq "0" ];then
+            up_h_expire_t=$(echo "${query_data}" | jq_speed .data.up_h_expire_t)
+
+            #检查是否开通提速套餐,上行套餐,下行套餐,试用套餐
+            if [ "$down_expire_t" -eq "0" ] && [ "$down_expire_trial_t" -eq "0" ] && [ "$up_expire_t" -eq "0" ]  && [ "$up_h_expire_t" -eq "0" ];then
                 need_speed="0"
               else
                 need_speed="1"
@@ -62,8 +69,17 @@ start_reopen(){
                   exit
                 else
                   tisu_data=$(curl -m 20 -s "$reopenapi")
+                  #写入提速最后执行日志
                   echo "$tisu_data" >$tisudatalog
+                  # shellcheck disable=SC2046
+                  # shellcheck disable=SC2005
                   if [ "$tisu_data" ];then
+                     #追加写入提速时间记录
+                     echo_date "本次IP:${newwanip}提速成功" >>$tisuactlog
+                     #最大记录10条日志
+                     sed -i '11,999d' $tisuactlog >/dev/null 2>&1
+
+                     #前端接口查询日志
                      tisumessage=$(date '+%Y-%m-%d %H:%M:%S')
                     else
                      tisumessage="<font color='yellow'>提速接口请求失败或请求超时</font>"
@@ -97,13 +113,16 @@ self_upgrade(){
    else
      echo_date "检查版本更新中...">>$LOGFILE
    fi
+
+   #通过接口获取新版本信息
    version_info=$(curl -s -m 10 "$versionapi")
    new_version=$(echo "${version_info}" | jq_speed .version)
    old_version=$(dbus get "softcenter_module_speedtestcnauto_version")
    # shellcheck disable=SC2154
    # shellcheck disable=SC2046
+   #比较版本信息 如果新版本大于当前安装版本或强制更新则执行更新脚本
    if [ $(expr "$new_version" \> "$old_version") -eq 1 ] || [ "${1}" ];then
-       tmpDir="/tmp/upload/speedtestcnauto_up/"
+       tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
        mkdir -p $tmpDir
        if [ "${1}" ];then
          echo_date "开始强制更新,如有更新后有异常,请重新离线安装插件..." >> $LOGFILE
@@ -112,6 +131,7 @@ self_upgrade(){
        fi
        echo_date "下载资源新版本资源..." >> $LOGFILE
        versionfile=$(echo "${version_info}"|jq_speed .fileurl |sed 's/\"//g')
+       #下载新版本安装包 目前是全量更新
        wget --no-cache -O ${tmpDir}speedtestcnauto.tar.gz "${versionfile}"
        if [ -f "${tmpDir}speedtestcnauto.tar.gz" ];then
          # shellcheck disable=SC2129
@@ -123,13 +143,20 @@ self_upgrade(){
          # shellcheck disable=SC2129
          echo_date "校验MD5为:${checkMd5}" >> $LOGFILE
          # shellcheck disable=SC1009
+         #校验MD5是否为打包MD5
          if [ "$newFileMd5" = "$checkMd5" ];then
             echo_date "MD5校验通过,开始更新..." >> $LOGFILE
-            echo_date "开始解压文件..." >> $LOGFILE
-            cd $tmpDir
+            echo_date "开始尝试解压安装包..." >> $LOGFILE
+            cd $tmpDir || exit
+
+            #解压到临时文件夹
             tar -zxvf ${tmpDir}speedtestcnauto.tar.gz
-            echo_date "文件解压成功..." >> $LOGFILE
+            echo_date "安装包文件解压成功..." >> $LOGFILE
+
+            #升级脚本赋权
             chmod +x "${tmpDir}speedtestcnauto/upgrade.sh"
+
+            #执行升级脚本
             start-stop-daemon -S -q -x "${tmpDir}speedtestcnauto/upgrade.sh" 2>&1
            else
             echo_date "文件MD5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
@@ -177,7 +204,8 @@ reopen)
   #手动提速
   if [ "${2}" = "reopen" ];then
     #清理缓存文件
-    rm -rf ${runtimeDir}*
+    rm -rf ${runtimeDir}
+    mkdir -p $runtimeDir
     #执行提速脚本
     start_reopen
     tisutips="手动提速执行成功,请自行确认是否提速成功."

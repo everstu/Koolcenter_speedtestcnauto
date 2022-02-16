@@ -12,6 +12,7 @@ rm -rf /koolshare/webs/Module_speedtestcnauto.asp
 rm -rf /koolshare/res/*speedtestcnauto*
 rm -rf /koolshare/init.d/*speedtestcnauto.sh
 rm -rf /koolshare/bin/jq_speed >/dev/null 2>&1
+#rm -rf /tmp/upload/speedtestcnauto* >/dev/null 2>&1
 echo_date "插件资源文件删除成功..."
 
 rm -rf /koolshare/scripts/uninstall_speedtestcnauto.sh
