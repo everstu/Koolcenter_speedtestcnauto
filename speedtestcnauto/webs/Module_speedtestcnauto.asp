@@ -359,29 +359,28 @@ function queryTisu(act)
             if(res.hasOwnProperty('data'))
             {
                 var data = res.data;
-                var down_text = '未开通下行提速套餐';
-                var up_text = '未开通上行提速套餐';
-                $('#tisu_status_2').html(formatTextColor(down_text));
-                if(data.down_expire_t)
-                {
-                    down_text = '已开通下行提速套餐';
-                }
-                if(data.down_expire_trial_t)
-                {
-                    down_text = '已开通下行试用套餐';
-                }
-                if(data.up_expire_t)
-                {
-                    up_text = '已开通上行提速套餐';
-                }
-                $('#tisu_status_2').html(down_text + ' / ' + up_text);
-
                 $('#tisu_status_3').html(data.addr.substring(0,data.addr.indexOf(':')));
                 if(data.hasOwnProperty('status'))
                 {
                     var status = data.status;
                     if(status.can_speed === 1)
                     {
+                        var down_text = formatTextColor('未开通下行提速套餐');
+                        var up_text = formatTextColor('未开通上行提速套餐');
+                        if(data.down_expire_t)
+                        {
+                            down_text = formatTextColor('已开通下行提速套餐', 2);
+                        }
+                        if(data.down_expire_trial_t)
+                        {
+                            down_text = formatTextColor('已开通下行试用套餐', 2);
+                        }
+                        if(data.up_expire_t)
+                        {
+                            up_text = formatTextColor('已开通上行提速套餐', 2);
+                        }
+                        $('#tisu_status_2').html(down_text + ' / ' + up_text);
+
                         $('#tisu_status_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_2').html(status.msg);
