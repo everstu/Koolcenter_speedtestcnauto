@@ -74,16 +74,16 @@ install_ui(){
 	# intall different UI
 	get_ui_type
 	if [ "${UI_TYPE}" == "ROG" ];then
-		echo_date "安装ROG皮肤！" >> $LOGFILE
+		echo_date "安装ROG皮肤！"
 		sed -i '/asuscss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 	if [ "${UI_TYPE}" == "TUF" ];then
-		echo_date "安装TUF皮肤！" >> $LOGFILE
+		echo_date "安装TUF皮肤！"
 		sed -i '/asuscss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 		sed -i 's/3e030d/3e2902/g;s/91071f/92650F/g;s/680516/D0982C/g;s/cf0a2c/c58813/g;s/700618/74500b/g;s/530412/92650F/g' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 	if [ "${UI_TYPE}" == "ASUSWRT" ];then
-		echo_date "安装ASUSWRT皮肤！" >> $LOGFILE
+		echo_date "安装ASUSWRT皮肤！"
 		sed -i '/rogcss/d' /koolshare/webs/Module_speedtestcnauto.asp >/dev/null 2>&1
 	fi
 }
@@ -113,8 +113,8 @@ install_now(){
   echo_date "版本号写入完成,启用插件中..." >> $LOGFILE
   /bin/sh /koolshare/scripts/speedtestcnauto_main.sh start >/dev/null 2>&1
   echo_date "插件启用成功..." >> $LOGFILE
-  echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
 	install_ui
+  echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
   rm -rf $tmpDir >/dev/null 2>&1
 }
 
