@@ -201,6 +201,28 @@ function viewChangelog()
     }
 }
 
+function tisuactlog()
+{
+    $.ajax({
+        type: "GET",
+        url: "/_temp/speedtestcnauto_tisuactlog",
+        async: true,
+        cache:false,
+        dataType: 'text',
+        success: function(response) {
+            var retArea = E("log_content");
+            E("loading_block_spilt").style.visibility = "hidden";
+            E("ok_button").style.visibility = "visible";
+            showLoadingBar('查看提速日志');
+            retArea.value = response;
+        },
+        error: function (xhr) {
+            E("ok_button").style.visibility = "visible";
+            return false;
+        }
+    });
+}
+
 
 function versionUpdate(act)
 {
@@ -269,9 +291,14 @@ function getRuntime()
         success: function(response) {
             var arr = response.result.split("@");
             if (arr[0] != "" && arr[1] != "") {
-                E("tisu_status_4").innerHTML = arr[0];
-                E("tisu_status_5").innerHTML = arr[1];
-                E("tisu_status_6").innerHTML = arr[2];
+                E("tisu_status_5").innerHTML = arr[0];
+                E("tisu_status_6").innerHTML = arr[1];
+                E("tisu_status_4").innerHTML = arr[2];
+                //如果提速成功则展示提速日志
+                if(arr[4] == 'yes')
+                {
+                    $("#tisuactlog").show();
+                }
                 NEEDQUERY = false;
             }
         }
@@ -439,9 +466,9 @@ function manualSpeedUp()
             success: function(response) {
                 var arr = response.result.split("@");
                 if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
-                    E("tisu_status_4").innerHTML = arr[0];
-                    E("tisu_status_5").innerHTML = arr[1];
-                    E("tisu_status_6").innerHTML = arr[2];
+                    E("tisu_status_5").innerHTML = arr[0];
+                    E("tisu_status_6").innerHTML = arr[1];
+                    E("tisu_status_4").innerHTML = arr[2];
                     E("warning").innerHTML       = arr[3];
                 }
             },
@@ -455,6 +482,7 @@ function manualSpeedUp()
         manualResetControl(60);
     }
 }
+
 var timeinter;
 function manualResetControl(time)
 {
@@ -660,20 +688,21 @@ function count_down_close() {
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">后台查询IP地址</th>
-                                                    <td id="tisu_status_6">
-                                                         等待程序运行 - Waiting for first refresh...
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th style="width:18%">最后运行时间</th>
                                                     <td id="tisu_status_4">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">最后提速时间</th>
+                                                    <th style="width:18%">最后运行时间</th>
                                                     <td id="tisu_status_5">
                                                          等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">最后提速时间</th>
+                                                    <td>
+                                                         <span id="tisu_status_6">等待程序运行 - Waiting for first refresh...</span>
+                                                         &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="tisuactlog" onClick="tisuactlog();" type="button" value="查看提速日志" />
                                                     </td>
                                                 </tr>
                                                 <tr>

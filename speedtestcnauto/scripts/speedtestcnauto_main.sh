@@ -10,6 +10,7 @@ runtimelog="${runtimeDir}runtimelog"
 tisutimelog="${runtimeDir}tisutimelog"
 querydatalog="${runtimeDir}querydatalog"
 tisudatalog="${runtimeDir}tisudatalog"
+isdotisulog="${runtimeDir}isdotisulog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
@@ -64,25 +65,32 @@ start_reopen(){
                 else
                   oldwanip="0.0.0.0"
                 fi
-                #对比上次IP，如相同则退出，否则执行提速
-                if [ "$newwanip" = "$oldwanip" ]; then
+                #查询上次是否标记为提速成功
+                if [ -f $isdotisulog ]; then
+                  isdotisu=$(cat $isdotisulog)
+                else
+                  isdotisu="no"
+                fi
+                #对比上次IP，如相同且提速标记为成功则退出，否则执行提速
+                if [ "$newwanip" = "$oldwanip" ] && [ "$isdotisu" = "yes" ]; then
                   exit
                 else
-                  tisu_data=$(curl -m 20 -s "$reopenapi")
+                  tisu_data=$(curl -m 30 -s "$reopenapi")
                   #写入提速最后执行日志
                   echo "$tisu_data" >$tisudatalog
                   # shellcheck disable=SC2046
                   # shellcheck disable=SC2005
                   if [ "$tisu_data" ];then
-                     #追加写入提速时间记录
-                     echo_date "本次IP:${newwanip}提速成功" >>$tisuactlog
-                     #最大记录10条日志
-                     sed -i '11,999d' $tisuactlog >/dev/null 2>&1
-
+                     record_tisuactlog
                      #前端接口查询日志
                      tisumessage=$(date '+%Y-%m-%d %H:%M:%S')
+                     #标记为成功提速
+                     echo "yes" > $isdotisulog
                     else
-                     tisumessage="<font color='yellow'>提速接口请求失败或请求超时</font>"
+                     #前端接口查询日志
+                     tisumessage="<font color='yellow'>执行提速接口请求失败或请求超时</font>"
+                     #标记为提速失败
+                     echo "no" > $isdotisulog
                   fi
                 fi
                 #缓存最新ip地址
@@ -95,10 +103,24 @@ start_reopen(){
         fi
       else
           # shellcheck disable=SC2089
-          tisumessage="<font color='yellow'>提速接口请求失败或请求超时</font>"
+          tisumessage="<font color='yellow'>提速查询接口请求失败或请求超时</font>"
     fi
     # shellcheck disable=SC2090
     echo "$tisumessage"  >$tisutimelog
+}
+
+record_tisuactlog(){
+  if [ ! -f $tisuactlog ];then
+      #写入提速时间记录
+      echo_date "当前IP：${newwanip} 提速操作执行成功" > $tisuactlog
+    else
+      # shellcheck disable=SC2034
+      tmptisuactlog=$(cat "$tisuactlog")
+      echo_date "当前IP：${newwanip} 提速操作执行成功" > $tisuactlog
+      echo "$tmptisuactlog" >> $tisuactlog
+      #最大记录10条日志
+      sed -i '11,999d' $tisuactlog >/dev/null 2>&1
+  fi
 }
 
 add_cron(){
@@ -115,7 +137,7 @@ self_upgrade(){
    fi
 
    #通过接口获取新版本信息
-   version_info=$(curl -s -m 10 "$versionapi")
+   version_info=$(curl -s -m 30 "$versionapi")
    new_version=$(echo "${version_info}" | jq_speed .version)
    old_version=$(dbus get "softcenter_module_speedtestcnauto_version")
    # shellcheck disable=SC2154
@@ -171,7 +193,7 @@ self_upgrade(){
 }
 
 queryStatus(){
-  query_data=$(curl -m 20 -s "$queryapi")
+  query_data=$(curl -m 30 -s "$queryapi")
 }
 
 case $1 in
@@ -200,6 +222,7 @@ reopen)
     queryStatus
     # shellcheck disable=SC2046
     http_response $(echo "$query_data"|base64_encode)
+    exit
   fi
   #手动提速
   if [ "${2}" = "reopen" ];then
@@ -220,9 +243,18 @@ reopen)
 #    fi
 #  fi
   #查询状态
+  #最后运行时间
   runtime=$(cat $runtimelog)
+  #最后提速时间
   tisutime=$(cat $tisutimelog)
+  #后台查询IP
   wanipaddr=$(cat $waniplogtxt)
-  http_response "$runtime@$tisutime@$wanipaddr@$tisutips"
+  #查询上次是否标记为提速成功
+  if [ -f $isdotisulog ]; then
+    isdotisu=$(cat $isdotisulog)
+  else
+    isdotisu="no"
+  fi
+  http_response "$runtime@$tisutime@$wanipaddr@$tisutips@$isdotisu"
 ;;
 esac
