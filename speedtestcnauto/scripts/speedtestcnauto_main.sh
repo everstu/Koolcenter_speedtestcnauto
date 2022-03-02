@@ -16,7 +16,7 @@ reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
 tisuactlog="/tmp/upload/speedtestcnauto_tisuactlog"
 can_speed="0"
-query_data="";
+query_data=""
 
 # shellcheck disable=SC2120
 start_reopen(){
@@ -96,10 +96,10 @@ start_reopen(){
                 #缓存最新ip地址
                 echo "$newwanip" > $lastwaniptxt
               else
-                tisumessage="<font color='yellow'>当前宽带支持提速,但是未开通提速套餐.</font>";
+                tisumessage="<font color='yellow'>当前宽带支持提速,但是未开通提速套餐.</font>"
             fi
           else
-            tisumessage="<font color='yellow'>当前宽带不支持提速</font>";
+            tisumessage="<font color='yellow'>当前宽带不支持提速</font>"
         fi
       else
           # shellcheck disable=SC2089
@@ -110,16 +110,19 @@ start_reopen(){
 }
 
 record_tisuactlog(){
-  if [ ! -f $tisuactlog ];then
-      #写入提速时间记录
-      echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
-    else
-      # shellcheck disable=SC2034
+  tmptisuactlog=""
+  #检查是否已经写入日志
+  if [ -f $tisuactlog ];then
       tmptisuactlog=$(cat "$tisuactlog")
-      echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
-      echo "$tmptisuactlog" >> $tisuactlog
-      #最大记录10条日志
-      sed -i '11,999d' $tisuactlog >/dev/null 2>&1
+  fi
+  #写入提速时间记录
+  echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
+  #如果有写入日志则追加写入
+  if [ "$tmptisuactlog" ];then
+    #写入追加日志
+    echo "$tmptisuactlog" >> $tisuactlog
+    #最大记录10条日志
+    sed -i '11,999d' $tisuactlog >/dev/null 2>&1
   fi
 }
 
