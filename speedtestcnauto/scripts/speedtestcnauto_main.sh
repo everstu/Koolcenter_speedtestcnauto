@@ -112,11 +112,11 @@ start_reopen(){
 record_tisuactlog(){
   if [ ! -f $tisuactlog ];then
       #写入提速时间记录
-      echo_date "当前IP：${newwanip} 提速操作执行成功" > $tisuactlog
+      echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
     else
       # shellcheck disable=SC2034
       tmptisuactlog=$(cat "$tisuactlog")
-      echo_date "当前IP：${newwanip} 提速操作执行成功" > $tisuactlog
+      echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
       echo "$tmptisuactlog" >> $tisuactlog
       #最大记录10条日志
       sed -i '11,999d' $tisuactlog >/dev/null 2>&1
