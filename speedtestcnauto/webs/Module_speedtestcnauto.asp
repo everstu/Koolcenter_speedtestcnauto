@@ -695,13 +695,13 @@ function count_down_close() {
                                                 <tr>
                                                     <th style="width:18%">最后运行时间</th>
                                                     <td>
-                                                         <span id="tisu_status_5">等待程序运行 - Waiting for first refresh...</span>
+                                                         <label id="tisu_status_5">等待程序运行 - Waiting for first refresh...</label>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">最后提速时间</th>
                                                     <td>
-                                                         <span id="tisu_status_6">等待程序运行 - Waiting for first refresh...</span>
+                                                         <label id="tisu_status_6">等待程序运行 - Waiting for first refresh...</label>
                                                          &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="tisuactlog" onClick="tisuactlog();" type="button" value="查看提速日志" />
                                                     </td>
                                                 </tr>
