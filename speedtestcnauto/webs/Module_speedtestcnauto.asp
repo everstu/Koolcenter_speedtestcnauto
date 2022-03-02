@@ -670,32 +670,32 @@ function count_down_close() {
                                                     <th style="width:18%">
                                                         <label>是否开通提速</label>
                                                     </th>
-                                                        <td id="tisu_status_2">
+                                                    <td id="tisu_status_2">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">宽带提速有效期</th>
                                                     <td id="tisu_status_7">
-                                                         等待程序运行 - Waiting for first refresh...
+                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">前台查询IP地址</th>
-                                                    <td id="tisu_status_3">
-                                                         等待程序运行 - Waiting for first refresh...
+                                                    <td>
+                                                        <span id="tisu_status_3">等待程序运行 - Waiting for first refresh...</span>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">后台查询IP地址</th>
-                                                    <td id="tisu_status_4">
-                                                         等待程序运行 - Waiting for first refresh...
+                                                    <td>
+                                                        <span id="tisu_status_4">等待程序运行 - Waiting for first refresh...</span>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <th style="width:18%">最后运行时间</th>
-                                                    <td id="tisu_status_5">
-                                                         等待程序运行 - Waiting for first refresh...
+                                                    <td >
+                                                        <span id="tisu_status_5">等待程序运行 - Waiting for first refresh...</span>
                                                     </td>
                                                 </tr>
                                                 <tr>
