@@ -92,7 +92,7 @@ install_now(){
   tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
 #  version_info=$(curl -s -m 10 "$versionapi")
 #  new_version=$(echo "${version_info}" | jq_speed .version)
-  new_version=$(cat tmpDir"speedtestcnauto/version")
+  new_version=$(cat ${tmpDir}"speedtestcnauto/version")
   echo_date "停止运行中脚本..." >> $LOGFILE
   sed -i '/speedtestcnauto_main/d' /var/spool/cron/crontabs/* >/dev/null 2>&1
   echo_date "开始处理旧文件..." >> $LOGFILE
