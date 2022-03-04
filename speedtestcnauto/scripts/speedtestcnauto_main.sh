@@ -122,7 +122,7 @@ record_tisuactlog(){
     #写入追加日志
     echo "$tmptisuactlog" >> $tisuactlog
     #最大记录10条日志
-    sed -i '11,999d' $tisuactlog >/dev/null 2>&1
+    sed -i '16,999d' $tisuactlog >/dev/null 2>&1
   fi
 }
 
