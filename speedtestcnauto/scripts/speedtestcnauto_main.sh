@@ -171,12 +171,14 @@ self_upgrade(){
          #校验MD5是否为打包MD5
          if [ "$newFileMd5" = "$checkMd5" ];then
             echo_date "MD5校验通过,开始更新..." >> $LOGFILE
+            sleep 1
             echo_date "开始尝试解压安装包..." >> $LOGFILE
             cd $tmpDir || exit
 
             #解压到临时文件夹
             tar -zxvf ${tmpDir}speedtestcnauto.tar.gz
             echo_date "安装包文件解压成功..." >> $LOGFILE
+            sleep 1
 
             #升级脚本赋权
             chmod +x "${tmpDir}speedtestcnauto/upgrade.sh"
