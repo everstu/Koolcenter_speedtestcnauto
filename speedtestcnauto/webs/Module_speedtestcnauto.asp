@@ -100,7 +100,7 @@ function init() {
     manualResetControl();
     checkVersion();
 }
-
+//检查版本更新
 function checkVersion()
 {
     if(! has_new_version)
@@ -174,7 +174,7 @@ function checkVersion()
         }
     );
 }
-
+//查看更新日志
 function viewChangelog()
 {
     if(changeLog)
@@ -200,7 +200,7 @@ function viewChangelog()
         retArea.value = logHtml;
     }
 }
-
+//查看提速日志
 function tisuactlog()
 {
     $.ajax({
@@ -222,8 +222,7 @@ function tisuactlog()
         }
     });
 }
-
-
+//升级版本
 function versionUpdate(act)
 {
     //act 0普通更新 1强制更新
@@ -242,7 +241,7 @@ function versionUpdate(act)
         }
     });
 }
-
+//获取更新日志
 function get_realtime_log(flag) {
     E("ok_button").style.visibility = "hidden";
     showLoadingBar();
@@ -278,7 +277,7 @@ function get_realtime_log(flag) {
         }
 	});
 }
-
+//获取运行日志
 function getRuntime()
 {
     var id2 = parseInt(Math.random() * 100000000);
@@ -308,8 +307,7 @@ function getRuntime()
         setTimeout("getRuntime()",5000);
     }
 }
-
-
+//显示标签
 function showTab()
 {
 	if($('.show-btn1').hasClass("active")){
@@ -333,7 +331,7 @@ function showTab()
         $("#kuandai_speedtest").hide();
 	}
 }
-
+//切换标签
 function tab_switch(){
 	$(".show-btn1").click(function() {
 		$('.show-btn1').addClass('active');
@@ -354,12 +352,12 @@ function tab_switch(){
         showTab();
 	});
 }
-
+//锁定菜单
 function menu_hook(title, tab) {
 	tabtitle[tabtitle.length - 1] = new Array("", "宽带自动提速");
 	tablink[tablink.length - 1] = new Array("", "Module_speedtestcnauto.asp");
 }
-
+//查询是否能提速
 function queryTisu(act)
 {
     var apiurl = 'https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index';
@@ -436,7 +434,7 @@ function queryTisu(act)
         }
     });
 }
-
+//格式化文字
 function formatTextColor(text, color)
 {
     let real_color = 'yellow';
@@ -447,6 +445,7 @@ function formatTextColor(text, color)
     return '<font color="'+real_color+'">'+text+'</font>';
 }
 
+//手动提速
 function manualSpeedUp()
 {
     queryTisu(1);
@@ -484,7 +483,7 @@ function manualSpeedUp()
         manualResetControl(60);
     }
 }
-
+//控制提速按钮
 var timeinter;
 function manualResetControl(time)
 {
