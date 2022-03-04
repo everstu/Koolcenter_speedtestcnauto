@@ -527,6 +527,10 @@ function manualResetControl(time)
             }
         },1000);
     }
+    else
+    {
+        $('#mSup').removeAttr('disabled');
+    }
 }
 
 function testSpeedTest() {
@@ -710,7 +714,7 @@ function count_down_close() {
                                                 <tr>
                                                     <th style="width:18%">手动提速操作</th>
                                                     <td>
-                                                         <input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" />
+                                                         <input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" disabled="disabled" />
                                                     </td>
                                                 </tr>
                                             </table>
