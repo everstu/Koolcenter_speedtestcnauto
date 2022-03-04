@@ -89,10 +89,11 @@ install_ui(){
 }
 
 install_now(){
-  tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
+  local tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
 #  version_info=$(curl -s -m 10 "$versionapi")
 #  new_version=$(echo "${version_info}" | jq_speed .version)
-  new_version=$(cat ${tmpDir}"speedtestcnauto/version")
+  # shellcheck disable=SC2155
+  local new_version=$(cat ${tmpDir}"speedtestcnauto/version")
   echo_date "停止运行中脚本..." >> $LOGFILE
   sed -i '/speedtestcnauto_main/d' /var/spool/cron/crontabs/* >/dev/null 2>&1
   echo_date "开始处理旧文件..." >> $LOGFILE
@@ -119,7 +120,6 @@ install_now(){
   sleep 1
   echo_date "插件启用成功..." >> $LOGFILE
 	install_ui
-  echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
   rm -rf $tmpDir >/dev/null 2>&1
 }
 

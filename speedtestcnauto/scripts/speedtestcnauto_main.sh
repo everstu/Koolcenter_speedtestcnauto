@@ -147,7 +147,7 @@ self_upgrade(){
    # shellcheck disable=SC2046
    #比较版本信息 如果新版本大于当前安装版本或强制更新则执行更新脚本
    if [ $(expr "$new_version" \> "$old_version") -eq 1 ] || [ "${1}" ];then
-       tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
+       local tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
        mkdir -p $tmpDir
        if [ "${1}" ];then
          echo_date "开始强制更新,如有更新后有异常,请重新离线安装插件..." >> $LOGFILE
@@ -185,6 +185,13 @@ self_upgrade(){
 
             #执行升级脚本
             start-stop-daemon -S -q -x "${tmpDir}speedtestcnauto/upgrade.sh" 2>&1
+            # shellcheck disable=SC2181
+            if [ "$?" != "0" ];then
+                rm -rf $tmpDir >/dev/null 2>&1
+            		echo_date "更新脚本运行出错,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
+              else
+                echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
+            fi
            else
             echo_date "文件MD5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
          fi
