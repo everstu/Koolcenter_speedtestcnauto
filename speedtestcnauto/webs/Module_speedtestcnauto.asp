@@ -392,6 +392,7 @@ function queryTisu(act)
                     var status = data.status;
                     if(status.can_speed === 1)
                     {
+                        CANSPEED=true;
                         var down_text = formatTextColor('未开通下行提速套餐');
                         var up_text = formatTextColor('未开通上行提速套餐');
                         if(data.down_expire_t)
@@ -415,6 +416,7 @@ function queryTisu(act)
                         $('#tisu_info_4').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up / 1024) + " M");
                         $('#tisu_info_5').html(status.remain_time);
                         $('#tisu_status_7').html(status.remain_time);
+                        $('#warning').html('');
                     }
                     else
                     {
