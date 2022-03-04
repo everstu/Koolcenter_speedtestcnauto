@@ -128,7 +128,7 @@ function checkVersion()
                                     var new_version = parseFloat(response['version']);
                                     if(new_version > old_version)
                                     {
-                                        $('#version_update').html('<font color="yellow">有新版本:v<font color="red">' + new_version + '</font>(点击更新)</font>');
+                                        $('#version_update').html('<font color="yellow">有新版本:<font color="red">v' + new_version + '</font>(点击更新)</font>');
                                         has_new_version = true;
                                     }
                                     else
