@@ -385,6 +385,20 @@ function menu_hook(title, tab) {
 //查询是否能提速
 function queryTisu(act)
 {
+    if(act == 0)
+    {
+        var location_href = window.location.href;
+        if(
+           (location_href.indexOf('http://192.') == -1
+        || location_href.indexOf('https://192.') == -1)
+        && (location_href.indexOf('.kooldns.cn') != -1
+        || location_href.indexOf('.ddnsto.com') != -1
+        || location_href.indexOf('.tocmcc.com') != -1)
+        )
+        {
+            act = 1;
+        }
+    }
     var apiurl = 'https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index';
     var methon_type = 'GET';
     var postData = '';
