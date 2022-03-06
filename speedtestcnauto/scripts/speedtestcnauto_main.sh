@@ -119,7 +119,7 @@ record_tisuactlog(){
       tmptisuactlog=$(cat "$tisuactlog")
   fi
   #写入提速时间记录
-  echo_date "本次IP：${newwanip} 提速成功 >>>" > $tisuactlog
+  echo_date "本次IP [ ${newwanip} ] 提速成功 >>>" > $tisuactlog
   #如果有写入日志则追加写入
   if [ "$tmptisuactlog" ];then
     #写入追加日志
