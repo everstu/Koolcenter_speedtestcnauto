@@ -203,24 +203,49 @@ function viewChangelog()
 //查看提速日志
 function tisuactlog()
 {
+    var id2 = parseInt(Math.random() * 100000000);
+    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['tisuactlog'], "fields": ""};
     $.ajax({
-        type: "GET",
-        url: "/_temp/speedtestcnauto_tisuactlog",
+        type: "POST",
+        url: "/_api/",
         async: true,
         cache:false,
-        dataType: 'text',
+        data: JSON.stringify(postData),
+        dataType: 'json',
         success: function(response) {
+            var reqRet = response.result;
+            console.log(response);
             var retArea = E("log_content");
             E("loading_block_spilt").style.visibility = "hidden";
             E("ok_button").style.visibility = "visible";
             showLoadingBar('查看提速日志');
-            retArea.value = response;
+            var logText;
+            if(reqRet)
+            {
+                var logArr = reqRet.split(">>>");
+                logText = "提速日志最多记录15条记录，以下是提速日志：\n\n"
+                $.each(logArr,function(k,v){
+                    if(v)
+                    {
+                        logText += (k+1) + "：" + trimStr(v) + "\n";
+                    }
+                });
+            }
+            else
+            {
+                logText = '未找到提速记录，提速后将自动记录日志~';
+            }
+            retArea.value = logText;
         },
         error: function (xhr) {
             E("ok_button").style.visibility = "visible";
             return false;
         }
     });
+}
+//去除字符串首尾空格
+function trimStr(str){
+    return str.replace(/(^\s*)|(\s*$)/g,"");
 }
 //升级版本
 function versionUpdate(act)

@@ -2,8 +2,11 @@
 # shellcheck disable=SC2039
 source /koolshare/scripts/base.sh
 alias echo_date='echo 【$(TZ=UTC-8 date -R +%Y年%m月%d日\ %X)】:'
-runtimeDir="/koolshare/speedtestcnauto/runtime/"
+speedAutoBaseDir="/koolshare/speedtestcnauto/"
+runtimeDir="${speedAutoBaseDir}runtime/"
+tisuactlogDir="${speedAutoBaseDir}tisuactlog/"
 mkdir -p $runtimeDir
+mkdir -p tisuactlogDir
 lastwaniptxt="${runtimeDir}lastwanip"
 waniplogtxt="${runtimeDir}waniplog"
 runtimelog="${runtimeDir}runtimelog"
@@ -14,7 +17,7 @@ isdotisulog="${runtimeDir}isdotisulog"
 queryapi="https://tisu-api.speedtest.cn/api/v2/speedup/query?source=www-index"
 reopenapi="https://tisu-api.speedtest.cn/api/v2/speedup/reopen?source=www"
 LOGFILE="/tmp/upload/speedtestcnauto_log.txt"
-tisuactlog="/tmp/upload/speedtestcnauto_tisuactlog"
+tisuactlog="${tisuactlogDir}speedtestcnauto_tisuactlog"
 can_speed="0"
 query_data=""
 
@@ -116,7 +119,7 @@ record_tisuactlog(){
       tmptisuactlog=$(cat "$tisuactlog")
   fi
   #写入提速时间记录
-  echo_date "本次IP：${newwanip} 提速成功" > $tisuactlog
+  echo_date "本次IP：${newwanip} 提速成功 >>>" > $tisuactlog
   #如果有写入日志则追加写入
   if [ "$tmptisuactlog" ];then
     #写入追加日志
@@ -234,6 +237,12 @@ reopen)
     queryStatus
     # shellcheck disable=SC2046
     http_response $(echo "$query_data"|base64_encode)
+    exit
+  fi
+  #查询提速日志
+  if [ "${2}" = "tisuactlog" ];then
+    # shellcheck disable=SC2046
+    http_response $(cat $tisuactlog)
     exit
   fi
   #手动提速
