@@ -227,7 +227,7 @@ function tisuactlog()
                 $.each(logArr,function(k,v){
                     if(v)
                     {
-                        logText += (k+1) + "：" + trimStr(v) + "\n";
+                        logText += "（" + (k+1) + "）" + trimStr(v) + "\n";
                     }
                 });
             }
