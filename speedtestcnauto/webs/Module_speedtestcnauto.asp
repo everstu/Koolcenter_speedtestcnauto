@@ -318,6 +318,17 @@ function getRuntime()
                 E("tisu_status_5").innerHTML = arr[0];
                 E("tisu_status_6").innerHTML = arr[1];
                 E("tisu_status_4").innerHTML = arr[2];
+
+                //检测程序运行
+                var lastruntime = dateToTimestamp(arr[0]);
+                if(lastruntime)
+                {
+                    var nowTime = (new Date).getTime();
+                    if((nowTime - lastruntime) > 1800000)
+                    {
+                        $("#dorestart").show();
+                    }
+                }
                 //如果提速成功则展示提速日志
                 if(arr[4] == 'yes')
                 {
@@ -331,6 +342,44 @@ function getRuntime()
     {
         setTimeout("getRuntime()",5000);
     }
+}
+//重新写入提速
+function dorestart()
+{
+    var id2 = parseInt(Math.random() * 100000000);
+    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['dorestart'], "fields": ""};
+    $.ajax({
+        type: "POST",
+        url: "/_api/",
+        async: true,
+        data: JSON.stringify(postData),
+        success: function(response) {
+            var arr = response.result.split("@");
+            if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
+                E("tisu_status_5").innerHTML = arr[0];
+                E("tisu_status_6").innerHTML = arr[1];
+                E("tisu_status_4").innerHTML = arr[2];
+                manualSpeedUp();
+                $("#dorestart").val(arr[3]);
+                setTimeout(function(){
+                    $("#dorestart").hide();
+                },5000);
+            }
+        },
+        error:function(){
+
+        }
+    });
+}
+//转换时间格式到时间戳
+function dateToTimestamp(dateStr) {
+     if (!dateStr) {
+         return ''
+     }
+     let newDataStr = dateStr.replace(/\.|\-/g, '/')
+     let date = new Date(newDataStr);
+     let timestamp = date.getTime();
+     return timestamp
 }
 //显示标签
 function showTab()
@@ -740,6 +789,7 @@ function count_down_close() {
                                                     <th style="width:18%">最后运行时间</th>
                                                     <td>
                                                          <label id="tisu_status_5">等待程序运行 - Waiting for first refresh...</label>
+                                                         &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="dorestart" onClick="dorestart();" type="button" value="程序未运行？点击重新运行" />
                                                     </td>
                                                 </tr>
                                                 <tr>
