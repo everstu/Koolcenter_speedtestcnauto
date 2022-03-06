@@ -6,7 +6,7 @@ speedAutoBaseDir="/koolshare/speedtestcnauto/"
 runtimeDir="${speedAutoBaseDir}runtime/"
 tisuactlogDir="${speedAutoBaseDir}tisuactlog/"
 mkdir -p $runtimeDir
-mkdir -p tisuactlogDir
+mkdir -p $tisuactlogDir
 lastwaniptxt="${runtimeDir}lastwanip"
 waniplogtxt="${runtimeDir}waniplog"
 runtimelog="${runtimeDir}runtimelog"
