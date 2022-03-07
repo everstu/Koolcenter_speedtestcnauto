@@ -89,6 +89,7 @@ var refresh_flag;
 var count_down;
 var changeLog;
 var has_new_version = false;
+var NOT_RUN = false;
 
 function init() {
     testSpeedTest();
@@ -214,7 +215,6 @@ function tisuactlog()
         dataType: 'json',
         success: function(response) {
             var reqRet = response.result;
-            console.log(response);
             var retArea = E("log_content");
             E("loading_block_spilt").style.visibility = "hidden";
             E("ok_button").style.visibility = "visible";
@@ -324,11 +324,24 @@ function getRuntime()
                 if(lastruntime)
                 {
                     var nowTime = (new Date).getTime();
-                    if((nowTime - lastruntime) > 1800000)
+                    //900秒,15分钟未运行则认为进程掉了.
+                    if((nowTime - lastruntime) > 900000)
                     {
+                        NOT_RUN = true;
                         $("#dorestart").show();
                     }
+                    else
+                    {
+                        NOT_RUN = false;
+                        $("#dorestart").hide();
+                    }
                 }
+                else
+                {
+                    NOT_RUN = true;
+                    $("#dorestart").show();
+                }
+
                 //如果提速成功则展示提速日志
                 if(arr[4] == 'yes')
                 {
@@ -346,30 +359,33 @@ function getRuntime()
 //重新写入提速
 function dorestart()
 {
-    var id2 = parseInt(Math.random() * 100000000);
-    var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['dorestart'], "fields": ""};
-    $.ajax({
-        type: "POST",
-        url: "/_api/",
-        async: true,
-        data: JSON.stringify(postData),
-        success: function(response) {
-            var arr = response.result.split("@");
-            if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
-                E("tisu_status_5").innerHTML = arr[0];
-                E("tisu_status_6").innerHTML = arr[1];
-                E("tisu_status_4").innerHTML = arr[2];
-                manualSpeedUp();
-                $("#dorestart").val(arr[3]);
-                setTimeout(function(){
-                    $("#dorestart").hide();
-                },5000);
-            }
-        },
-        error:function(){
+    if(NOT_RUN)
+    {
+        var id2 = parseInt(Math.random() * 100000000);
+        var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['dorestart'], "fields": ""};
+        $.ajax({
+            type: "POST",
+            url: "/_api/",
+            async: true,
+            data: JSON.stringify(postData),
+            success: function(response) {
+                var arr = response.result.split("@");
+                if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
+                    E("tisu_status_5").innerHTML = arr[0];
+                    E("tisu_status_6").innerHTML = arr[1];
+                    E("tisu_status_4").innerHTML = arr[2];
+                    manualSpeedUp();
+                    $("#dorestart").val(arr[3]);
+                    setTimeout(function(){
+                        $("#dorestart").hide();
+                    },5000);
+                }
+            },
+            error:function(){
 
-        }
-    });
+            }
+        });
+    }
 }
 //转换时间格式到时间戳
 function dateToTimestamp(dateStr) {
@@ -644,7 +660,6 @@ function testSpeedTest() {
         });
     }
     link.onerror = function () {
-        console.log('accessTest fail')
         $(link).remove();//删除元素
         $('#kuandai_speedtest').html('<h2 style="text-align:center;">您的路由器不支持测速功能!</h2>');
     }
