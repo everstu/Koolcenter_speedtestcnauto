@@ -377,6 +377,7 @@ function dorestart()
                     manualSpeedUp();
                     $("#dorestart").val(arr[3]);
                     setTimeout(function(){
+                        NOT_RUN = false;
                         $("#dorestart").hide();
                     },5000);
                 }
