@@ -27,6 +27,12 @@ start_reopen(){
     # shellcheck disable=SC2005
     echo $(date '+%Y-%m-%d %H:%M:%S') >$runtimelog
     tisumessage="<font color='yellow'>当前宽带不支持提速</font>"
+    #查询上次是否标记为提速成功
+    if [ -f $isdotisulog ]; then
+      isdotisu=$(cat $isdotisulog)
+    else
+      isdotisu="no"
+    fi
 
     #查询接口
     queryStatus
@@ -68,12 +74,6 @@ start_reopen(){
                 else
                   oldwanip="0.0.0.0"
                 fi
-                #查询上次是否标记为提速成功
-                if [ -f $isdotisulog ]; then
-                  isdotisu=$(cat $isdotisulog)
-                else
-                  isdotisu="no"
-                fi
                 #对比上次IP，如相同且提速标记为成功则退出，否则执行提速
                 if [ "$newwanip" = "$oldwanip" ] && [ "$isdotisu" = "yes" ]; then
                   exit
@@ -108,8 +108,12 @@ start_reopen(){
           # shellcheck disable=SC2089
           tisumessage="<font color='yellow'>提速查询接口请求失败或请求超时</font>"
     fi
-    # shellcheck disable=SC2090
-    echo "$tisumessage"  >$tisutimelog
+
+    #未提速成功才复写提速日志,已经提速成功了不复写提速日志
+    if [ "$isdotisu" = "no" ];then
+      # shellcheck disable=SC2090
+      echo "$tisumessage"  >$tisutimelog
+    fi
 }
 
 record_tisuactlog(){
@@ -188,6 +192,7 @@ self_upgrade(){
 
             #执行升级脚本
             start-stop-daemon -S -q -x "${tmpDir}speedtestcnauto/upgrade.sh" 2>&1
+            sleep 1
             # shellcheck disable=SC2181
             if [ "$?" != "0" ];then
                 rm -rf $tmpDir >/dev/null 2>&1
