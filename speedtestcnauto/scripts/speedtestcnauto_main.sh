@@ -169,27 +169,32 @@ self_upgrade(){
          # shellcheck disable=SC2129
          echo_date "新版本下载成功.." >> $LOGFILE
          newFileMd5=$(md5sum ${tmpDir}speedtestcnauto.tar.gz|cut -d ' ' -f1)
-         echo_date "下载文件MD5为:${newFileMd5}" >> $LOGFILE
+         echo_date "下载文件MD5为:" >> $LOGFILE
+         echo_date "${newFileMd5}" >> $LOGFILE
          # shellcheck disable=SC2005
          checkMd5=$(echo "${version_info}" |jq_speed .md5sum |sed 's/\"//g')
          # shellcheck disable=SC2129
-         echo_date "校验MD5为:${checkMd5}" >> $LOGFILE
+         echo_date "校验MD5为:" >> $LOGFILE
+         echo_date "${checkMd5}" >> $LOGFILE
          # shellcheck disable=SC1009
          #校验MD5是否为打包MD5
          if [ "$newFileMd5" = "$checkMd5" ];then
-            echo_date "MD5校验通过,开始更新..." >> $LOGFILE
+            echo_date "MD5校验通过..." >> $LOGFILE
             sleep 1
-            echo_date "开始尝试解压安装包..." >> $LOGFILE
+            echo_date "开始更新插件..." >> $LOGFILE
+            sleep 1
+            echo_date "尝试解压安装包..." >> $LOGFILE
+            sleep 1
             cd $tmpDir || exit
-
             #解压到临时文件夹
             tar -zxvf ${tmpDir}speedtestcnauto.tar.gz
-            echo_date "安装包文件解压成功..." >> $LOGFILE
+            echo_date "安装包解压成功..." >> $LOGFILE
             sleep 1
-
             #升级脚本赋权
             chmod +x "${tmpDir}speedtestcnauto/upgrade.sh"
 
+            echo_date "执行更新脚本..." >> $LOGFILE
+            sleep 1
             #执行升级脚本
             start-stop-daemon -S -q -x "${tmpDir}speedtestcnauto/upgrade.sh" 2>&1
             sleep 1

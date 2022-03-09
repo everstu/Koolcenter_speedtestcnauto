@@ -94,7 +94,7 @@ install_now(){
 #  new_version=$(echo "${version_info}" | jq_speed .version)
   # shellcheck disable=SC2155
   local new_version=$(cat ${tmpDir}"speedtestcnauto/version")
-  echo_date "停止运行中脚本..." >> $LOGFILE
+  echo_date "停止运行插件..." >> $LOGFILE
   sed -i '/speedtestcnauto_main/d' /var/spool/cron/crontabs/* >/dev/null 2>&1
   echo_date "开始处理旧文件..." >> $LOGFILE
   rm -rf /koolshare/speedtestcnauto
@@ -112,10 +112,14 @@ install_now(){
   cp -rf ${tmpDir}speedtestcnauto/webs/* /koolshare/webs/
   cp -rf ${tmpDir}speedtestcnauto/uninstall.sh /koolshare/scripts/uninstall_speedtestcnauto.sh
   sleep 1
-  echo_date "文件更新成功,开始写入版本号:${new_version}..." >> $LOGFILE
+  echo_date "文件更新成功..." >> $LOGFILE
+  sleep 1
+  echo_date "开始写入版本号:${new_version}..." >> $LOGFILE
   dbus set softcenter_module_speedtestcnauto_version="${new_version}"
   sleep 1
-  echo_date "版本号写入完成,启用插件中..." >> $LOGFILE
+  echo_date "版本号写入完成..." >> $LOGFILE
+  sleep 1
+  echo_date "启用插件中..." >> $LOGFILE
   /bin/sh /koolshare/scripts/speedtestcnauto_main.sh start >/dev/null 2>&1
   sleep 1
   echo_date "插件启用成功..." >> $LOGFILE
