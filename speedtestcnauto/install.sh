@@ -127,7 +127,7 @@ install_ui(){
 install_now(){
 	# default value
 	local TITLE="宽带自动提速"
-	local DESCR="speedtest.cn宽带自动提速脚本"
+	local DESCR="开通提速套餐后,自动执行宽带提速操作的插件!"
 	local PLVER=$(cat ${DIR}/version)
 
 	# isntall file

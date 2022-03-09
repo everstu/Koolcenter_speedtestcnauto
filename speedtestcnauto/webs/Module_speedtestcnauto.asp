@@ -13,6 +13,7 @@
 <link rel="stylesheet" type="text/css" href="form_style.css"/>
 <link rel="stylesheet" type="text/css" href="css/element.css">
 <link rel="stylesheet" type="text/css" href="res/softcenter.css">
+<link rel="stylesheet" type="text/css" href="/res/layer/theme/default/layer.css">
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script language="JavaScript" type="text/javascript" src="/help.js"></script>
 <script language="JavaScript" type="text/javascript" src="/general.js"></script>
@@ -23,6 +24,15 @@
 <script type="text/javascript" src="/switcherplugin/jquery.iphone-switch.js"></script>
 <script type="text/javascript" src="/res/softcenter.js"></script>
 <style>
+
+body .layui-layer-lan .layui-layer-btn0 {border-color:#22ab39; background-color:#22ab39;color:#fff; background:#22ab39}
+body .layui-layer-lan .layui-layer-btn .layui-layer-btn1 {border-color:#1678ff; background-color:#1678ff;color:#fff;}
+body .layui-layer-lan .layui-layer-btn2 {border-color:#FF6600; background-color:#FF6600;color:#fff;}
+body .layui-layer-lan .layui-layer-title {background: #1678ff;}
+body .layui-layer-lan .layui-layer-btn a{margin:8px 8px 0;padding:5px 18px;}
+body .layui-layer-lan .layui-layer-btn {text-align:center}
+
+
 .loadingBarBlock{
     width:740px;
 }
@@ -496,19 +506,23 @@ function queryTisu(act)
                     if(status.can_speed === 1)
                     {
                         CANSPEED=true;
+                        var down_status = false;
+                        var up_status = false;
                         var down_text = formatTextColor('未开通下行提速套餐');
                         var up_text = formatTextColor('未开通上行提速套餐');
                         if(data.down_expire_t)
                         {
-                            down_text = formatTextColor('已开通下行提速套餐', 2);
+                            down_status = true;
+                            down_text   = formatTextColor('已开通下行提速套餐', 2);
                         }
                         if(data.down_expire_trial_t)
                         {
-                            down_text = formatTextColor('已开通下行试用套餐', 2);
+                            down_text   = formatTextColor('已开通下行试用套餐', 2);
                         }
                         if(data.up_expire_t)
                         {
-                            up_text = formatTextColor('已开通上行提速套餐', 2);
+                            up_status = true;
+                            up_text   = formatTextColor('已开通上行提速套餐', 2);
                         }
                         $('#tisu_status_2').html(down_text + ' / ' + up_text);
 
@@ -516,10 +530,28 @@ function queryTisu(act)
                         $('#tisu_info_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_2').html(status.msg);
                         $('#tisu_info_3').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
+                        $('#tisu_status_8').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
                         $('#tisu_info_4').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up / 1024) + " M");
+                        $('#tisu_status_9').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up / 1024) + " M");
                         $('#tisu_info_5').html(status.remain_time);
                         $('#tisu_status_7').html(status.remain_time);
                         $('#warning').html('');
+                        if(! down_status ||  ! up_status)
+                        {
+                            $("#affTisu").show();
+                            if(! down_status && ! up_status)
+                            {
+                                $("#tisu_status_2").hide();
+                            }
+                            else if(! down_status)
+                            {
+                                $("#affTisu").val('未开通下行提速套餐?点击此处开通');
+                            }
+                            else
+                            {
+                                $("#affTisu").val('未开通上行提速套餐?点击此处开通');
+                            }
+                        }
                     }
                     else
                     {
@@ -527,6 +559,8 @@ function queryTisu(act)
                         $('#tisu_status_1').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_2').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_7').html(formatTextColor('当前宽带不支持提速',1));
+                        $('#tisu_status_8').html(formatTextColor('当前宽带不支持提速',1));
+                        $('#tisu_status_9').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_1').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_2').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_info_3').html(formatTextColor('当前宽带不支持提速',1));
@@ -703,6 +737,22 @@ function count_down_close() {
     --count_down;
     setTimeout("count_down_close();", 1000);
 }
+
+function affTisu()
+{
+    require(['/res/layer/layer.js'], function(layer) {
+        layer.alert($('#afftisu_info').html(), {
+            time: 3e4,
+            shade: 0.8,
+            maxWidth: '800px',
+            title:'微信扫码开通提速'
+        }, function(index) {
+            layer.close(index);
+            return false;
+        });
+    });
+}
+
 </script>
 </head>
 <body onload="init();">
@@ -769,22 +819,39 @@ function count_down_close() {
                                             <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th style="width:18%">
-                                                        <label>宽带能否提速</label>
+                                                        <label>宽带能否开通提速</label>
                                                     </th>
                                                     <td id="tisu_status_1">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">
-                                                        <label>是否开通提速</label>
-                                                    </th>
-                                                    <td id="tisu_status_2">
+                                                    <th style="width:18%">宽带当前基本速率</th>
+                                                    <td id="tisu_status_8">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带提速有效期</th>
+                                                    <th style="width:18%">宽带升级后速率</th>
+                                                    <td id="tisu_status_9">
+                                                         等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">
+                                                        <label>是否开通提速套餐</label>
+                                                    </th>
+                                                    <td>
+                                                        <label id="tisu_status_2">等待程序运行 - Waiting for first refresh...</label>
+                                                         &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="affTisu" onClick="affTisu();" type="button" value="未开通宽带提速套餐?点击此处开通" />
+                                                         <label id="afftisu_info" style="display:none;">
+                                                             <span style="font-size: 18px;color:red;">请使用微信下面的二维码开通提速套餐~</span><br/><br/>
+                                                             <img src="https://file-to-read.oss-cn-hangzhou.aliyuncs.com/aff_speedtestcn.jpg" style="width:320px;height:auto;">
+                                                         </label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">提速套餐有效期</th>
                                                     <td id="tisu_status_7">
                                                           等待程序运行 - Waiting for first refresh...
                                                     </td>
@@ -802,14 +869,14 @@ function count_down_close() {
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">最后运行时间</th>
+                                                    <th style="width:18%">插件最后运行时间</th>
                                                     <td>
                                                          <label id="tisu_status_5">等待程序运行 - Waiting for first refresh...</label>
                                                          &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="dorestart" onClick="dorestart();" type="button" value="程序未运行？点击重新运行" />
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">最后提速时间</th>
+                                                    <th style="width:18%">插件最后提速时间</th>
                                                     <td>
                                                          <label id="tisu_status_6">等待程序运行 - Waiting for first refresh...</label>
                                                          &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="tisuactlog" onClick="tisuactlog();" type="button" value="查看提速日志" />
@@ -840,7 +907,7 @@ function count_down_close() {
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带基本速率</th>
+                                                    <th style="width:18%">宽带当前基本速率</th>
                                                     <td id="tisu_info_3">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
