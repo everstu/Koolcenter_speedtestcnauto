@@ -836,7 +836,7 @@ function affTisu()
                                             <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th style="width:18%">
-                                                        <label>宽带能否开通提速</label>
+                                                        <label>宽带是否支持提速</label>
                                                     </th>
                                                     <td id="tisu_status_1">
                                                          等待程序运行 - Waiting for first refresh...
@@ -911,7 +911,7 @@ function affTisu()
                                             <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
                                                 <tr>
                                                     <th style="width:18%">
-                                                        <label>宽带能否提速</label>
+                                                        <label>宽带是否支持提速</label>
                                                     </th>
                                                     <td id="tisu_info_1">
                                                          等待程序运行 - Waiting for first refresh...
