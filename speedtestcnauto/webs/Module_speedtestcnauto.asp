@@ -100,6 +100,8 @@ var count_down;
 var changeLog;
 var has_new_version = false;
 var NOT_RUN = false;
+var frontIP = '前台查询：N/A';
+var backendIP = '后台查询：N/A';
 
 function init() {
     testSpeedTest();
@@ -327,7 +329,8 @@ function getRuntime()
             if (arr[0] != "" && arr[1] != "") {
                 E("tisu_status_5").innerHTML = arr[0];
                 E("tisu_status_6").innerHTML = arr[1];
-                E("tisu_status_4").innerHTML = arr[2];
+                backendIP = "后台查询：" + formatTextColor(arr[2]);
+                E("tisu_status_3").innerHTML = frontIP + "</br>" + backendIP;
 
                 //检测程序运行
                 var lastruntime = dateToTimestamp(arr[0]);
@@ -383,7 +386,8 @@ function dorestart()
                 if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
                     E("tisu_status_5").innerHTML = arr[0];
                     E("tisu_status_6").innerHTML = arr[1];
-                    E("tisu_status_4").innerHTML = arr[2];
+                    backendIP = "后台查询：" + formatTextColor(arr[2]);
+                    E("tisu_status_3").innerHTML = frontIP + "</br>" + backendIP;
                     manualSpeedUp();
                     $("#dorestart").val(arr[3]);
                     setTimeout(function(){
@@ -499,7 +503,8 @@ function queryTisu(act)
             if(res.hasOwnProperty('data'))
             {
                 var data = res.data;
-                $('#tisu_status_3').html(data.addr.substring(0,data.addr.indexOf(':')));
+                frontIP = "前台查询：" + formatTextColor(data.addr.substring(0,data.addr.indexOf(':')));
+                $('#tisu_status_3').html(frontIP + "</br>" + backendIP);
                 if(data.hasOwnProperty('status'))
                 {
                     var status = data.status;
@@ -529,10 +534,20 @@ function queryTisu(act)
                         $('#tisu_status_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_1').html(formatTextColor('当前宽带支持提速',2));
                         $('#tisu_info_2').html(status.msg);
-                        $('#tisu_info_3').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
-                        $('#tisu_status_8').html("下行速率：" + formatTextColor(data.basic_down / 1024) +" M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M");
-                        $('#tisu_info_4').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up_h / 1024) + " M");
-                        $('#tisu_status_9').html("下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up_h / 1024) + " M");
+                        //当前宽带基本速率
+                        var basic_speed_text = "下行速率：" + formatTextColor(data.basic_down / 1024) + " M / 上行速率：" + formatTextColor(data.basic_up / 1024) + " M";
+                        $('#tisu_info_3').html(basic_speed_text);
+                        $('#tisu_status_8').html(basic_speed_text);
+                        //宽带提速可达速率
+                        var can_speed_text = "下行速率：" + formatTextColor(data.target_down / 1024) +" M / 上行速率：" + formatTextColor(data.target_up_h / 1024) + " M";
+                        $('#tisu_status_9').html(can_speed_text);
+                        //宽带提速后速率
+                        var now_down_speed  = down_status ? data.target_down : data.basic_down;
+                        var now_up_speed    = up_status ? data.target_up : data.basic_up;
+                        var done_speed_text = "下行速率：" + formatTextColor(now_down_speed / 1024) +" M / 上行速率：" + formatTextColor(now_up_speed / 1024) + " M";
+                        $('#tisu_info_4').html(done_speed_text);
+                        $('#tisu_status_4').html(done_speed_text);
+                        //提速套餐剩余有效期
                         $('#tisu_info_5').html(status.remain_time);
                         $('#tisu_status_7').html(status.remain_time);
                         $('#warning').html('');
@@ -558,6 +573,7 @@ function queryTisu(act)
                         CANSPEED = false;
                         $('#tisu_status_1').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_2').html(formatTextColor('当前宽带不支持提速',1));
+                        $('#tisu_status_4').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_7').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_8').html(formatTextColor('当前宽带不支持提速',1));
                         $('#tisu_status_9').html(formatTextColor('当前宽带不支持提速',1));
@@ -608,7 +624,8 @@ function manualSpeedUp()
                 if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
                     E("tisu_status_5").innerHTML = arr[0];
                     E("tisu_status_6").innerHTML = arr[1];
-                    E("tisu_status_4").innerHTML = arr[2];
+                    backendIP = "后台查询：" + formatTextColor(arr[2]);
+                    E("tisu_status_3").innerHTML = frontIP + "</br>" + backendIP ;
                     E("warning").innerHTML       = arr[3];
                 }
             },
@@ -826,14 +843,20 @@ function affTisu()
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带当前基本速率</th>
+                                                    <th style="width:18%">当前宽带基本速率</th>
                                                     <td id="tisu_status_8">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带升级后速率</th>
+                                                    <th style="width:18%">提速可达最大速率</th>
                                                     <td id="tisu_status_9">
+                                                         等待程序运行 - Waiting for first refresh...
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width:18%">当前宽带提速后速率</th>
+                                                    <td id="tisu_status_4">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
@@ -845,26 +868,20 @@ function affTisu()
                                                         <label id="tisu_status_2">等待程序运行 - Waiting for first refresh...</label>
                                                          &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="affTisu" onClick="affTisu();" type="button" value="未开通宽带提速套餐?点击此处开通" />
                                                          <label id="afftisu_info" style="display:none;">
-                                                             <span style="font-size: 18px;color:red;">请使用微信下面的二维码开通提速套餐~</span><br/><br/>
+                                                             <span style="font-size: 18px;color:red;">微信扫描下面的二维码开通提速套餐~</span><br/><br/>
                                                              <img src="https://file-to-read.oss-cn-hangzhou.aliyuncs.com/aff_speedtestcn.jpg" style="width:320px;height:auto;">
                                                          </label>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">提速套餐有效期</th>
+                                                    <th style="width:18%">提速套餐剩余有效期</th>
                                                     <td id="tisu_status_7">
                                                           等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">前台查询IP地址</th>
+                                                    <th style="width:18%">当前Wan IP地址</th>
                                                     <td id="tisu_status_3">
-                                                        等待程序运行 - Waiting for first refresh...
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th style="width:18%">后台查询IP地址</th>
-                                                    <td id="tisu_status_4">
                                                         等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
@@ -907,19 +924,19 @@ function affTisu()
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带当前基本速率</th>
+                                                    <th style="width:18%">当前宽带基本速率</th>
                                                     <td id="tisu_info_3">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带升级后速率</th>
+                                                    <th style="width:18%">宽带提速后速率</th>
                                                     <td id="tisu_info_4">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="width:18%">宽带提速有效期</th>
+                                                    <th style="width:18%">宽带提速剩余有效期</th>
                                                     <td id="tisu_info_5">
                                                          等待程序运行 - Waiting for first refresh...
                                                     </td>
