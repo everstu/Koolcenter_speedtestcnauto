@@ -216,6 +216,22 @@ queryStatus(){
   query_data=$(curl -m 30 -s "$queryapi")
 }
 
+getBase64(){
+	if [ -f "/koolshare/bin/base64_decode" ]; then #HND有这个
+		base=base64_decode
+	elif [ -f "/bin/base64" ]; then #HND是这个
+		base=base64
+	elif [ -f "/koolshare/bin/base64" ]; then #网件R7K是这个
+		base=base64
+	elif [ -f "/sbin/base64" ]; then
+		base=base64
+	else
+	  # shellcheck disable=SC2209
+	  base=echo
+	fi
+	echo $base
+}
+
 case $1 in
 start)
 	# 开机启动
@@ -242,7 +258,9 @@ reopen)
   if [ "${2}" = "query" ];then
     queryStatus
     # shellcheck disable=SC2046
-    http_response $(echo "$query_data"|base64_encode)
+    base64Cmd=$(getBase64)
+    # shellcheck disable=SC2046
+    http_response $(echo "$query_data" |$base64Cmd)
     exit
   fi
   #查询提速日志
