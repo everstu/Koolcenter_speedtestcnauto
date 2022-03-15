@@ -944,8 +944,9 @@ function affTisu()
 <!-- 												<input class="button_gen" id="mSup" onClick="manualSpeedUp();" type="button" value="手动提速" /> -->
                                         </div>
                                         <div class="SimpleNote">
-                                            <li>如果使用中提速有任何问题,可以点击<a href="javascript:void();" onClick="manualSpeedUp();"><em><u>手动提速</u></em></a>来清除所有插件缓存,重新触发提速</li>
-                                            <li>插件使用有任何问题请加入<a href="https://t.me/xbchat" target="_blank"><em><u>koolcenter TG群</u></em></a>联系@fiswonder</li>
+                                            <li>如果使用中提速有任何问题,可以点击<a href="javascript:void();"><em><u>手动提速</u></em></a>来清除所有插件缓存,重新触发提速</li>
+<!--                                             <li>插件使用有任何问题请加入<a href="https://t.me/xbchat" target="_blank"><em><u>koolcenter TG群</u></em></a>或<a href="https://t.me/meilinchajian" target="_blank"><em><u>Mc Chat TG群</u></em></a>联系 <a href="https://t.me/fiswonder" target="_blank"><em><u>@fiswonder</u></em></a></li> -->
+                                            <li>插件使用有任何问题请加入<a href="https://t.me/xbchat" target="_blank"><em><u>koolcenter TG群</u></em></a>或<a href="https://t.me/meilinchajian" target="_blank"><em><u>Mc Chat TG群</u></em></a>联系 @fiswonder</li>
                                         </div>
                                     </td>
                                 </tr>
