@@ -114,7 +114,7 @@ install_now(){
 	#写入开机自启动
 	if [ ! -L "/koolshare/init.d/S99${module}.sh" ];then
 		# shellcheck disable=SC2086
-		ln -sf /koolshare/scripts/${module}_main.sh /koolshare/init.d/S99${module}.sh
+		ln -sf /koolshare/scripts/${module}_main.sh /koolshare/init.d/S99speedtestcnauto.sh
 	fi
   echo_date "插件更新成功..." >> $LOGFILE
   sleep 1
