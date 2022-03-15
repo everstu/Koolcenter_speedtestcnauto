@@ -169,16 +169,15 @@ self_upgrade(){
          # shellcheck disable=SC2129
          echo_date "新版本下载成功.." >> $LOGFILE
          newFileMd5=$(md5sum ${tmpDir}speedtestcnauto.tar.gz|cut -d ' ' -f1)
-         echo_date "MD5为:" >> $LOGFILE
-         echo_date "${newFileMd5}" >> $LOGFILE
+         echo_date "文件md5:${newFileMd5}" >> $LOGFILE
          # shellcheck disable=SC2005
          checkMd5=$(echo "${version_info}" |jq_speed .md5sum |sed 's/\"//g')
          # shellcheck disable=SC2129
-         echo_date "校验更新文件中..." >> $LOGFILE
+         echo_date "校验更新文件md5中..." >> $LOGFILE
          # shellcheck disable=SC1009
          #校验MD5是否为打包MD5
          if [ "$newFileMd5" = "$checkMd5" ];then
-            echo_date "文件MD5校验通过,开始更新插件..." >> $LOGFILE
+            echo_date "文件md5校验通过,开始更新插件..." >> $LOGFILE
             sleep 1
             echo_date "尝试解压安装包..." >> $LOGFILE
             sleep 1
@@ -200,11 +199,13 @@ self_upgrade(){
                 echo_date "更新完成,享受新版本吧~~~" >> $LOGFILE
             fi
            else
-            echo_date "文件MD5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
+            echo_date "文件md5校验失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
          fi
        else
          echo_date "新版本资源下载失败,退出更新,请离线更新或稍后再更新..." >> $LOGFILE
        fi
+       #删除安装文件
+       rm -rf $tmpDir >/dev/null 2>&1
      else
        echo_date "当前版本:v${old_version}是最新版本,无需更新!" >> $LOGFILE
    fi
