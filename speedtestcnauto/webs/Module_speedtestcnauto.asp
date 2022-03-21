@@ -262,7 +262,6 @@ function trimStr(str){
 //升级版本
 function versionUpdate(act)
 {
-    console.log(act);
     //act 0普通更新 1强制更新
     var id2 = parseInt(Math.random() * 100000000);
     var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update', act], "fields": ""};
