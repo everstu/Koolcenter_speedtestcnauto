@@ -262,6 +262,7 @@ function trimStr(str){
 //升级版本
 function versionUpdate(act)
 {
+    console.log(act);
     //act 0普通更新 1强制更新
     var id2 = parseInt(Math.random() * 100000000);
     var postData = {"id": id2, "method": "speedtestcnauto_main.sh", "params":['update', act], "fields": ""};
@@ -855,7 +856,7 @@ function affTisu()
                                                          &nbsp;&nbsp;<input style="display:none;" class="button_gen" id="affTisu" onClick="affTisu();" type="button" value="未开通宽带提速套餐?点击此处开通" />
                                                          <label id="afftisu_info" style="display:none;">
                                                              <span style="font-size: 18px;color:red;">微信扫描下面的二维码开通提速套餐~</span><br/><br/>
-                                                             <img src="https://file-to-read.oss-cn-hangzhou.aliyuncs.com/aff_speedtestcn.jpg" style="width:320px;height:auto;">
+                                                             <img src="https://file-to-read.oss-cn-hangzhou.aliyuncs.com/aff_speedtestcn.png" style="width:320px;height:auto;">
                                                          </label>
                                                     </td>
                                                 </tr>

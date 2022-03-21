@@ -23,6 +23,7 @@ query_data=""
 
 # shellcheck disable=SC2120
 start_reopen(){
+    local dotisumessagelog="no"
     # shellcheck disable=SC2046
     # shellcheck disable=SC2005
     echo $(date '+%Y-%m-%d %H:%M:%S') >$runtimelog
@@ -95,6 +96,7 @@ start_reopen(){
                      #标记为提速失败
                      echo "no" > $isdotisulog
                   fi
+                  dotisumessagelog="yes"
                 fi
                 #缓存最新ip地址
                 echo "$newwanip" > $lastwaniptxt
@@ -110,7 +112,7 @@ start_reopen(){
     fi
 
     #未提速成功才复写提速日志,已经提速成功了不复写提速日志
-    if [ "$isdotisu" = "no" ];then
+    if [ "$dotisumessagelog" = "yes" ];then
       # shellcheck disable=SC2090
       echo "$tisumessage"  >$tisutimelog
     fi
@@ -140,7 +142,7 @@ add_cron(){
 
 self_upgrade(){
    versionapi="https://raw.githubusercontents.com/wengheng/Koolcenter_speedtestcnauto/master/version_info"
-   if [ "${1}" ];then
+   if [ "${1}" = "yes" ];then
      echo_date "获取最新版本中..." >> $LOGFILE
    else
      echo_date "检查版本更新中...">>$LOGFILE
@@ -153,10 +155,10 @@ self_upgrade(){
    # shellcheck disable=SC2154
    # shellcheck disable=SC2046
    #比较版本信息 如果新版本大于当前安装版本或强制更新则执行更新脚本
-   if [ $(expr "$new_version" \> "$old_version") -eq 1 ] || [ "${1}" ];then
+   if [ $(expr "$new_version" \> "$old_version") -eq 1 ] || [ "${1}" = "yes" ];then
        local tmpDir="/tmp/upload/speedtestcnauto_upgrade/"
        mkdir -p $tmpDir
-       if [ "${1}" ];then
+       if [ "${1}" = "yes" ];then
          echo_date "开始强制更新,如有更新后有异常,请重新离线安装插件..." >> $LOGFILE
        else
          echo_date "新版本:${new_version}已发布,开始更新..." >> $LOGFILE
@@ -246,11 +248,11 @@ reopen)
   if [ "${2}" = "update" ];then
     echo "" > $LOGFILE
     http_response "$1"
-    if [ "${3}" = '1' ];then
+    if [ "${3}" = "1" ];then
       #强制更新
-      self_upgrade 1
+      self_upgrade "yes"
     else
-      self_upgrade 0
+      self_upgrade "no"
     fi
     exit;
   fi
