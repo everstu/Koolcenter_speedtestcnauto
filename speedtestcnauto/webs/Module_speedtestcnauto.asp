@@ -601,6 +601,7 @@ function formatTextColor(text, color)
 //手动提速
 function manualSpeedUp()
 {
+    manualResetControl(60);
     queryTisu(1);
     var setTime = 60;
     var time = setTime;
@@ -614,9 +615,6 @@ function manualSpeedUp()
             url: "/_api/",
             async: true,
             data: JSON.stringify(postData),
-            beforeSend:function (){
-                manualResetControl(60);
-            },
             success: function(response) {
                 var arr = response.result.split("@");
                 if (arr[0] != "" && arr[1] != "" && arr[2] != "" && arr[3] != "") {
@@ -631,10 +629,6 @@ function manualSpeedUp()
 
             }
         });
-    }
-    else
-    {
-        manualResetControl(60);
     }
 }
 //控制提速按钮
